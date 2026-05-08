@@ -104,10 +104,6 @@ my-api/
     │   │   ├── posts.ts
     │   │   ├── sessions.ts
     │   │   └── index.ts            ← Re-exports all tables
-    │   ├── repositories/
-    │   │   ├── users.repo.ts
-    │   │   ├── posts.repo.ts
-    │   │   └── sessions.repo.ts
     │   └── migrations/             ← drizzle-kit generated SQL files
     │
     ├── modules/
@@ -133,6 +129,11 @@ my-api/
     │   ├── users.service.ts
     │   └── posts.service.ts
     │
+    ├── repositories/
+    │   ├── users.repo.ts
+    │   ├── posts.repo.ts
+    │   └── sessions.repo.ts
+    |
     └── cron/
         ├── index.ts                ← Scheduled event dispatcher
         └── jobs/
