@@ -8,7 +8,7 @@
 		"docker:up": "docker compose up -d",
 		"docker:down": "docker-compose down",
 		"docker:clean": "docker-compose down -v",
-		"docker:seed": "docker exec -i starter-template-hono-db-1 psql -U postgres -d mydb < ./src/db/seeds/create_admin.sql",
+		"docker:seed": "docker exec -i starter-template-hono-postgres psql -U postgres -d starter_template_hono < ./src/db/seeds/create_admin.sql",
 		"db:generate": "bun drizzle-kit generate",
 		"db:migrate": "bun drizzle-kit migrate",
 		"db:studio": "bun drizzle-kit studio",
@@ -24,6 +24,7 @@
 		"drizzle-orm": "^0.45.2",
 		"hono": "^4.12.16",
 		"pg": "^8.20.0",
+		"xlsx": "^0.18.5",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {

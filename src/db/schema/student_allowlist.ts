@@ -1,11 +1,12 @@
 import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { staffProfile } from './staff_profiles';
+import { user } from './auth';
 
 export const studentAllowlist = pgTable('student_allowlist', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	studentNumber: text('student_number').notNull().unique(),
-	isRegistered: boolean('is_registered').default(false),
-	uploadedBy: text('uploaded_by').references(() => staffProfile.userId),
+	name: text('name'),
+	isRegistered: boolean('is_registered').default(false).notNull(),
+	uploadedBy: text('uploaded_by').references(() => user.id),
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
 		.defaultNow()
 		.notNull(),

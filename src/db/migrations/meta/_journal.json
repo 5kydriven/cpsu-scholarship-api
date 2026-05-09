@@ -36,6 +36,27 @@
       "when": 1778309407371,
       "tag": "0004_warm_ultimatum",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1778337325596,
+      "tag": "0005_lean_wind_dancer",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1778339762185,
+      "tag": "0006_absurd_katie_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1778340649242,
+      "tag": "0007_adorable_sleepwalker",
+      "breakpoints": true
     }
   ]
 }

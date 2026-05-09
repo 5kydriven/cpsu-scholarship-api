@@ -7,6 +7,7 @@ import { authRoute } from '@/modules/auth/auth.route';
 import { coursesRoute } from '@/modules/courses/courses.route';
 import { errorHandler } from '@/middleware/error-handler';
 import { staffProfilesRoute } from '@/modules/staff_profiles/staff_profiles.route';
+import { studentAllowlistsRoute } from '@/modules/student_allowlists/student_allowlists.route';
 import type { AppEnv } from '@/types/app';
 import { logger } from 'hono/logger';
 
@@ -34,7 +35,7 @@ app.use(
 app.doc('/openapi.json', (c) => ({
 	openapi: '3.0.0',
 	info: {
-		title: 'Starter Template Hono API',
+		title: 'CPSU Scholarship API',
 		version: '1.0.0',
 		description:
 			'Cloudflare Worker API built with Hono, Better Auth, Drizzle, and OpenAPI.',
@@ -51,7 +52,7 @@ app.get(
 	'/docs',
 	Scalar({
 		url: '/openapi.json',
-		pageTitle: 'Starter Template Hono API Docs',
+		pageTitle: 'CPSU Scholarship API Docs',
 	}),
 );
 
@@ -64,5 +65,6 @@ app.get('/', (c) => c.text('Hello Hono!'));
 app.route('/api/v1/auth', authRoute);
 app.route('/api/v1/courses', coursesRoute);
 app.route('/api/v1/personnels', staffProfilesRoute);
+app.route('/api/v1/student-allowlists', studentAllowlistsRoute);
 
 export default app;

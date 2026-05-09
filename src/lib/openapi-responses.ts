@@ -6,6 +6,10 @@ export const forbidden = {
 	description: 'Forbidden',
 } as const;
 
+export const conflict = {
+	description: 'Conflict',
+} as const;
+
 export const validationError = {
 	description: 'Request validation failed',
 } as const;
