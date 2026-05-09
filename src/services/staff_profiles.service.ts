@@ -60,9 +60,9 @@ export const createStaffProfilesService = (
 	},
 
 	async getById(id: string) {
-		const staff = await staffProfilesRepo.findById(id);
-		if (!staff) throw Errors.notFound('Personnel not found');
-		return staff;
+		const personnel = await staffProfilesRepo.findById(id);
+		if (!personnel) throw Errors.notFound('Personnel not found');
+		return personnel;
 	},
 
 	async update(id: string, data: UpdateStaffProfileInput) {

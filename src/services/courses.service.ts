@@ -1,5 +1,8 @@
 import { Errors } from '@/lib/errors';
-import { UpdateCourseInput } from '@/modules/courses/courses.schema';
+import {
+	CreateCourseInput,
+	UpdateCourseInput,
+} from '@/modules/courses/courses.schema';
 import type { CoursesRepo } from '@/repositories/courses.repo';
 
 export const createCoursesService = (coursesRepo: CoursesRepo) => ({
@@ -9,7 +12,7 @@ export const createCoursesService = (coursesRepo: CoursesRepo) => ({
 		return course;
 	},
 
-	async create(data: { name: string; abbreviation: string; major?: string }) {
+	async create(data: CreateCourseInput) {
 		return coursesRepo.create({
 			name: data.name,
 			abbreviation: data.abbreviation,

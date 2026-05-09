@@ -58,3 +58,4 @@ export const CoursesOffsetQuerySchema = OffsetQuerySchema.extend({
 export const CoursesCursorQuerySchema = CursorQuerySchema;
 
 export type UpdateCourseInput = z.infer<typeof UpdateCourseSchema>;
+export type CreateCourseInput = z.infer<typeof CreateCourseSchema>;
