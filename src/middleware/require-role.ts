@@ -3,10 +3,9 @@ import { HTTPException } from 'hono/http-exception';
 import type { AppEnv, UserRole } from '../types/app';
 
 const roleRank: Record<UserRole, number> = {
-	viewer: 1,
-	member: 2,
-	editor: 3,
-	admin: 4,
+	student: 1,
+	personnel: 2,
+	admin: 3,
 };
 
 export const requireRole = (

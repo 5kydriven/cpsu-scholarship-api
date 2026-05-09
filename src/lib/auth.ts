@@ -21,6 +21,7 @@ export const createAuth = (db: Db, env: CloudflareBindings) => {
 		emailAndPassword: {
 			enabled: true,
 			requireEmailVerification: false,
+			autoSignIn: false,
 		},
 
 		user: {
@@ -28,7 +29,7 @@ export const createAuth = (db: Db, env: CloudflareBindings) => {
 				role: {
 					type: 'string',
 					required: false,
-					defaultValue: 'member',
+					defaultValue: 'student',
 					input: false,
 				},
 			},

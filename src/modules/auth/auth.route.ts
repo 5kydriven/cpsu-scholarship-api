@@ -21,6 +21,8 @@ const unauthorized = {
 export const registerRoute = createRoute({
 	method: 'post',
 	path: '/register',
+	tags: ['Auth'],
+	summary: 'Register a new user',
 	request: {
 		body: {
 			content: {
@@ -46,6 +48,8 @@ export const registerRoute = createRoute({
 export const loginRoute = createRoute({
 	method: 'post',
 	path: '/login',
+	tags: ['Auth'],
+	summary: 'Login a user',
 	request: {
 		body: {
 			content: {
@@ -72,6 +76,8 @@ export const loginRoute = createRoute({
 export const logoutRoute = createRoute({
 	method: 'post',
 	path: '/logout',
+	tags: ['Auth'],
+	summary: 'Logout current user',
 	responses: {
 		200: {
 			description: 'Logged out',
@@ -88,6 +94,8 @@ export const logoutRoute = createRoute({
 export const meRoute = createRoute({
 	method: 'get',
 	path: '/me',
+	tags: ['Auth'],
+	summary: 'Get current user',
 	responses: {
 		200: {
 			description: 'Current authenticated user',

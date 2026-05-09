@@ -15,8 +15,8 @@ export const AuthUserSchema = z.object({
 	id: z.string().openapi({ example: 'user_123' }),
 	name: z.string().openapi({ example: 'Maria Santos' }),
 	email: z.email().openapi({ example: 'maria@example.com' }),
-	role: z.enum(['admin', 'editor', 'member', 'viewer']).openapi({
-		example: 'member',
+	role: z.enum(['admin', 'personnel', 'student']).openapi({
+		example: 'student',
 	}),
 });
 

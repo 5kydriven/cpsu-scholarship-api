@@ -9,7 +9,7 @@ import type {
 	registerRoute,
 } from './auth.route';
 
-const validRoles: UserRole[] = ['admin', 'editor', 'member', 'viewer'];
+const validRoles: UserRole[] = ['admin', 'personnel', 'student'];
 
 const appendAuthHeaders = (headers: Headers, c: Context<AppEnv>) => {
 	headers.forEach((value, key) => {
@@ -30,7 +30,7 @@ const toAuthUser = (user: {
 }) => {
 	const role = validRoles.includes(user.role as UserRole)
 		? (user.role as UserRole)
-		: 'member';
+		: 'student';
 
 	return {
 		id: user.id,
@@ -40,7 +40,9 @@ const toAuthUser = (user: {
 	};
 };
 
-export const register: RouteHandler<typeof registerRoute, AppEnv> = async (c) => {
+export const register: RouteHandler<typeof registerRoute, AppEnv> = async (
+	c,
+) => {
 	const body = c.req.valid('json');
 	const auth = c.get('auth');
 
@@ -49,8 +51,6 @@ export const register: RouteHandler<typeof registerRoute, AppEnv> = async (c) =>
 		headers: c.req.raw.headers,
 		returnHeaders: true,
 	});
-
-	appendAuthHeaders(result.headers, c);
 
 	return c.json(
 		{

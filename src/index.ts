@@ -4,13 +4,13 @@ import { dbMiddleware } from '@/middleware/db';
 import { cors } from 'hono/cors';
 import { withAuth } from '@/middleware/with-auth';
 import { authRoute } from '@/modules/auth/auth.route';
+import { coursesRoute } from '@/modules/courses/courses.route';
 import { errorHandler } from '@/middleware/error-handler';
 import type { AppEnv } from '@/types/app';
-import { logger } from './middleware/logger';
+import { logger } from 'hono/logger';
 
 const app = new OpenAPIHono<AppEnv>();
 
-app.use('*', logger())
 app.onError(errorHandler);
 
 app.use(
@@ -56,11 +56,11 @@ app.get(
 
 app.use('*', dbMiddleware());
 app.use('*', withAuth);
+app.use('*', logger());
 
-app.get('/', (c) => {
-	return c.text('Hello Hono!');
-});
+app.get('/', (c) => c.text('Hello Hono!'));
 
 app.route('/api/v1/auth', authRoute);
+app.route('/api/v1/courses', coursesRoute);
 
 export default app;

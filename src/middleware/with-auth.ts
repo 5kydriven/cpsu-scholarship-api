@@ -31,7 +31,7 @@ export const withAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
 					id: session.user.id,
 					email: session.user.email,
 					name: session.user.name,
-					role: (session.user as any).role ?? 'member',
+					role: (session.user as any).role ?? 'student',
 				}
 			: null,
 	);

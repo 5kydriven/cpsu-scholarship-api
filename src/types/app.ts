@@ -1,7 +1,7 @@
 import type { Db } from '@/db';
 import type { Auth } from '../lib/auth';
 
-export type UserRole = 'admin' | 'editor' | 'member' | 'viewer';
+export type UserRole = 'admin' | 'personnel' | 'student';
 
 export type AppBindings = {
 	DATABASE_URL: string;
