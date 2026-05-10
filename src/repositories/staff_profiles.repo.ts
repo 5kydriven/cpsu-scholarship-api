@@ -8,16 +8,40 @@ import type { SortOrder } from '@/types/common';
 export const createStaffProfilesRepo = (db: Db) => ({
 	findById: (id: string) =>
 		db
-			.select()
+			.select({
+				id: staffProfile.id,
+				userId: staffProfile.userId,
+				firstName: staffProfile.firstName,
+				lastName: staffProfile.lastName,
+				department: staffProfile.department,
+				position: staffProfile.position,
+				role: user.role,
+				contactNumber: staffProfile.contactNumber,
+				createdAt: staffProfile.createdAt,
+				updatedAt: staffProfile.updatedAt,
+			})
 			.from(staffProfile)
+			.innerJoin(user, eq(staffProfile.userId, user.id))
 			.where(eq(staffProfile.id, id))
 			.limit(1)
 			.then((r) => r[0] ?? null),
 
 	findByUserId: (userId: string) =>
 		db
-			.select()
+			.select({
+				id: staffProfile.id,
+				userId: staffProfile.userId,
+				firstName: staffProfile.firstName,
+				lastName: staffProfile.lastName,
+				department: staffProfile.department,
+				position: staffProfile.position,
+				role: user.role,
+				contactNumber: staffProfile.contactNumber,
+				createdAt: staffProfile.createdAt,
+				updatedAt: staffProfile.updatedAt,
+			})
 			.from(staffProfile)
+			.innerJoin(user, eq(staffProfile.userId, user.id))
 			.where(eq(staffProfile.userId, userId))
 			.limit(1)
 			.then((r) => r[0] ?? null),
@@ -30,20 +54,60 @@ export const createStaffProfilesRepo = (db: Db) => ({
 			.returning()
 			.then((r) => r[0] ?? null),
 
-	create: (data: NewStaffProfile) =>
-		db
+	create: async (data: NewStaffProfile) => {
+		const [profile] = await db
 			.insert(staffProfile)
 			.values(data)
-			.returning()
-			.then((r) => r[0]),
+			.returning();
 
-	update: (id: string, data: Partial<NewStaffProfile>) =>
-		db
+		return db
+			.select({
+				id: staffProfile.id,
+				userId: staffProfile.userId,
+				firstName: staffProfile.firstName,
+				lastName: staffProfile.lastName,
+				department: staffProfile.department,
+				position: staffProfile.position,
+				role: user.role,
+				contactNumber: staffProfile.contactNumber,
+				createdAt: staffProfile.createdAt,
+				updatedAt: staffProfile.updatedAt,
+			})
+			.from(staffProfile)
+			.innerJoin(user, eq(staffProfile.userId, user.id))
+			.where(eq(staffProfile.id, profile.id))
+			.limit(1)
+			.then((r) => r[0]);
+	},
+
+	update: async (id: string, data: Partial<NewStaffProfile>) => {
+		const [profile] = await db
 			.update(staffProfile)
 			.set({ ...data, updatedAt: new Date().toISOString() })
 			.where(eq(staffProfile.id, id))
-			.returning()
-			.then((r) => r[0] ?? null),
+			.returning();
+
+		if (!profile) return null;
+
+		return db
+			.select({
+				id: staffProfile.id,
+				userId: staffProfile.userId,
+				firstName: staffProfile.firstName,
+				lastName: staffProfile.lastName,
+				department: staffProfile.department,
+				position: staffProfile.position,
+				role: user.role,
+				contactNumber: staffProfile.contactNumber,
+				createdAt: staffProfile.createdAt,
+				updatedAt: staffProfile.updatedAt,
+			})
+			.from(staffProfile)
+			.innerJoin(user, eq(staffProfile.userId, user.id))
+			.where(eq(staffProfile.id, profile.id))
+			.limit(1)
+			.then((r) => r[0] ?? null);
+	},
 
 	delete: (id: string) =>
 		db
@@ -90,8 +154,20 @@ export const createStaffProfilesRepo = (db: Db) => ({
 
 		const [rows, [{ value: total }]] = await Promise.all([
 			db
-				.select()
+				.select({
+					id: staffProfile.id,
+					userId: staffProfile.userId,
+					firstName: staffProfile.firstName,
+					lastName: staffProfile.lastName,
+					department: staffProfile.department,
+					position: staffProfile.position,
+					role: user.role,
+					contactNumber: staffProfile.contactNumber,
+					createdAt: staffProfile.createdAt,
+					updatedAt: staffProfile.updatedAt,
+				})
 				.from(staffProfile)
+				.innerJoin(user, eq(staffProfile.userId, user.id))
 				.where(where)
 				.orderBy(orderBy)
 				.limit(perPage)
@@ -117,8 +193,20 @@ export const createStaffProfilesRepo = (db: Db) => ({
 			: undefined;
 
 		const rows = await db
-			.select()
+			.select({
+				id: staffProfile.id,
+				userId: staffProfile.userId,
+				firstName: staffProfile.firstName,
+				lastName: staffProfile.lastName,
+				department: staffProfile.department,
+				position: staffProfile.position,
+				role: user.role,
+				contactNumber: staffProfile.contactNumber,
+				createdAt: staffProfile.createdAt,
+				updatedAt: staffProfile.updatedAt,
+			})
 			.from(staffProfile)
+			.innerJoin(user, eq(staffProfile.userId, user.id))
 			.where(where)
 			.orderBy(
 				direction === 'next' ? asc(staffProfile.id) : desc(staffProfile.id),

@@ -20,9 +20,12 @@ export const createStudentAllowlistService = (
 		return studentAllowlistsRepo.findByStudentNumber(studentNumber);
 	},
 
-	async markRegistered(studentNumber: string) {
+	async markRegistered(studentNumber: string, registeredUserId: string) {
 		const studentAllowlist =
-			await studentAllowlistsRepo.markRegistered(studentNumber);
+			await studentAllowlistsRepo.markRegistered(
+				studentNumber,
+				registeredUserId,
+			);
 		if (!studentAllowlist) throw new Error('Student Allowlist not found');
 		return studentAllowlist;
 	},

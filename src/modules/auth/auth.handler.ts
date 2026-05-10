@@ -149,7 +149,10 @@ export const studentRegister: RouteHandler<
 			name: allowlist.name ?? normalizedStudentNumber,
 			email: createdUser.email,
 		});
-		await allowlistService.markRegistered(normalizedStudentNumber);
+		await allowlistService.markRegistered(
+			normalizedStudentNumber,
+			createdUser.id,
+		);
 	} catch (err) {
 		if (createdStudent) {
 			await studentsService.delete(createdStudent.id).catch((cleanupErr) => {

@@ -5,7 +5,18 @@ import {
 } from '@/db/schema/student_allowlist';
 import { decodeCursor, encodeCursor } from '@/lib/pagination';
 import { SortOrder } from '@/types/common';
-import { and, asc, count, desc, eq, gt, ilike, inArray, lt, or } from 'drizzle-orm';
+import {
+	and,
+	asc,
+	count,
+	desc,
+	eq,
+	gt,
+	ilike,
+	inArray,
+	lt,
+	or,
+} from 'drizzle-orm';
 
 export const createStudentAllowlistsRepo = (db: Db) => ({
 	findById: (id: string) =>
@@ -24,13 +35,21 @@ export const createStudentAllowlistsRepo = (db: Db) => ({
 			.limit(1)
 			.then((r) => r[0] ?? null),
 
-	markRegistered: (studentNumber: string) =>
-		db
+	markRegistered: (studentNumber: string, registeredUserId: string) => {
+		const now = new Date().toISOString();
+
+		return db
 			.update(studentAllowlist)
-			.set({ isRegistered: true, updatedAt: new Date().toISOString() })
+			.set({
+				isRegistered: true,
+				registeredUserId,
+				registeredAt: now,
+				updatedAt: now,
+			})
 			.where(eq(studentAllowlist.studentNumber, studentNumber))
 			.returning()
-			.then((r) => r[0] ?? null),
+			.then((r) => r[0] ?? null);
+	},
 
 	findExistingStudentNumbers: async (studentNumbers: string[]) => {
 		if (studentNumbers.length === 0) return new Set<string>();

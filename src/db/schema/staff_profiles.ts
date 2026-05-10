@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { user, userRoleEnum } from './auth';
+import { user } from './auth';
 
 export const staffProfile = pgTable('staff_profiles', {
 	id: uuid('id').defaultRandom().primaryKey(),
@@ -11,7 +11,6 @@ export const staffProfile = pgTable('staff_profiles', {
 	lastName: text('last_name').notNull(),
 	department: text('department').notNull(),
 	position: text('position').notNull(),
-	role: userRoleEnum('role').notNull(),
 	contactNumber: text('contact_number'),
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
 		.defaultNow()

@@ -32,7 +32,6 @@ export const createStaffProfilesService = (
 				lastName: data.lastName,
 				department: data.department,
 				position: data.position,
-				role: 'personnel',
 				contactNumber: data.contactNumber,
 			});
 

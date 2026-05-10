@@ -1,24 +1,10 @@
-import {
-	decimal,
-	pgEnum,
-	pgTable,
-	text,
-	timestamp,
-	uuid,
-} from 'drizzle-orm/pg-core';
-
-export const programStatusEnum = pgEnum('program_status', [
-	'open',
-	'under_review',
-	'closed',
-]);
+import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const scholarshipPrograms = pgTable('scholarship_programs', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	name: text('name').notNull(),
 	description: text('description'),
-	total: decimal('total_budget'),
-	status: programStatusEnum('status').default('open'),
+	isArchived: boolean('is_archived').default(false),
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
 		.defaultNow()
 		.notNull(),

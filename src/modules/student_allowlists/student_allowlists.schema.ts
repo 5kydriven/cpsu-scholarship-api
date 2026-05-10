@@ -21,6 +21,8 @@ export const StudentAllowlistsResponseSchema = z.object({
 	name: z.string().nullable(),
 	isRegistered: z.boolean(),
 	uploadedBy: z.string().nullable(),
+	registeredUserId: z.string().nullable(),
+	registeredAt: z.string().nullable(),
 	createdAt: z.string(),
 	updatedAt: z.string(),
 });
