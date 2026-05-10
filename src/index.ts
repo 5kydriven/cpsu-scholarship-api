@@ -60,7 +60,7 @@ app.use('*', logger());
 app.use('*', dbMiddleware());
 app.use('*', withAuth);
 
-app.get('/', (c) => c.text('Hello Hono!'));
+app.get('/', (c) => c.text('Server is up and running'));
 
 app.route('/api/v1/auth', authRoute);
 app.route('/api/v1/courses', coursesRoute);

@@ -78,6 +78,13 @@
       "when": 1778436086173,
       "tag": "0010_drop_staff_profile_role",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1778426204789,
+      "tag": "0011_charming_shaman",
+      "breakpoints": true
     }
   ]
 }

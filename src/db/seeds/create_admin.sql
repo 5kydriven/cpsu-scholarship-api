@@ -42,37 +42,29 @@ BEGIN
 		"updated_at" = now()
 	RETURNING "id" INTO actual_user_id;
 
-	IF EXISTS (
-		SELECT 1
-		FROM "account"
-		WHERE "user_id" = actual_user_id
-			AND "provider_id" = 'credential'
-	) THEN
-		UPDATE "account"
-		SET
-			"account_id" = actual_user_id,
-			"password" = admin_password_hash,
-			"updated_at" = now()
-		WHERE "user_id" = actual_user_id
-			AND "provider_id" = 'credential';
-	ELSE
-		INSERT INTO "account" (
-			"id",
-			"account_id",
-			"provider_id",
-			"user_id",
-			"password",
-			"created_at",
-			"updated_at"
-		)
-		VALUES (
-			'credential_' || actual_user_id,
-			actual_user_id,
-			'credential',
-			actual_user_id,
-			admin_password_hash,
-			now(),
-			now()
-		);
-	END IF;
+	INSERT INTO "account" (
+		"id",
+		"account_id",
+		"provider_id",
+		"user_id",
+		"password",
+		"created_at",
+		"updated_at"
+	)
+	VALUES (
+		'credential_' || actual_user_id,
+		actual_user_id,
+		'credential',
+		actual_user_id,
+		admin_password_hash,
+		now(),
+		now()
+	)
+	ON CONFLICT ("id") DO UPDATE
+	SET
+		"account_id" = EXCLUDED."account_id",
+		"provider_id" = EXCLUDED."provider_id",
+		"user_id" = EXCLUDED."user_id",
+		"password" = EXCLUDED."password",
+		"updated_at" = now();
 END $$;
