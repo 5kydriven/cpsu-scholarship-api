@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "starter-template-hono",
+	"name": "cpsu-scholarship-api",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-05-04",
 	"compatibility_flags": ["nodejs_compat"],

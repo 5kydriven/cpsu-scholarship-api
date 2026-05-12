@@ -85,6 +85,41 @@
       "when": 1778426204789,
       "tag": "0011_charming_shaman",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1778517378538,
+      "tag": "0012_little_riptide",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1778517654563,
+      "tag": "0013_flashy_darkstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1778519340459,
+      "tag": "0014_salty_scrambler",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1778520379374,
+      "tag": "0015_outstanding_mephistopheles",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1778521150766,
+      "tag": "0016_goofy_winter_soldier",
+      "breakpoints": true
     }
   ]
 }
