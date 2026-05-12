@@ -1,4 +1,5 @@
 import { z } from '@hono/zod-openapi';
+import { USER_ROLES } from '@/constants/roles';
 
 export const RegisterSchema = z.object({
 	name: z.string().min(1).max(100).openapi({ example: 'Maria Santos' }),
@@ -11,17 +12,54 @@ export const LoginSchema = z.object({
 	password: z.string().min(8).openapi({ example: 'supersecret123' }),
 });
 
+export const StudentVerifyQuerySchema = z.object({
+	studentNumber: z.string().min(1).openapi({ example: '2025-0015-R' }),
+});
+
+export const StudentRegisterSchema = z.object({
+	studentNumber: z.string().min(1).openapi({ example: '2025-0015-R' }),
+	email: z.email().openapi({ example: 'student@example.com' }),
+	password: z.string().min(8).openapi({ example: 'supersecret123' }),
+});
+
+export const StudentLoginSchema = z.object({
+	studentNumber: z.string().min(1).openapi({ example: '2025-0015-R' }),
+	password: z.string().min(8).openapi({ example: 'supersecret123' }),
+});
+
 export const AuthUserSchema = z.object({
 	id: z.string().openapi({ example: 'user_123' }),
 	name: z.string().openapi({ example: 'Maria Santos' }),
 	email: z.email().openapi({ example: 'maria@example.com' }),
-	role: z.enum(['admin', 'editor', 'member', 'viewer']).openapi({
-		example: 'member',
+	role: z.enum(USER_ROLES).openapi({
+		example: 'student',
 	}),
 });
 
 export const AuthResponseSchema = z.object({
 	user: AuthUserSchema,
+});
+
+export const StudentAuthProfileSchema = z.object({
+	studentNumber: z.string().openapi({ example: '2025-0015-R' }),
+	name: z.string().nullable().openapi({ example: 'ABELO, JANEL' }),
+	email: z.email().optional().openapi({ example: 'student@example.com' }),
+});
+
+export const StudentAuthResponseSchema = z.object({
+	user: AuthUserSchema,
+	student: StudentAuthProfileSchema.extend({
+		email: z.email().openapi({ example: 'student@example.com' }),
+	}),
+});
+
+export const StudentVerifyResponseSchema = z.object({
+	allowed: z.boolean().openapi({ example: true }),
+	isRegistered: z.boolean().openapi({ example: false }),
+	nextAction: z.enum(['denied', 'register', 'login']).openapi({
+		example: 'register',
+	}),
+	student: StudentAuthProfileSchema.omit({ email: true }).nullable(),
 });
 
 export const SessionResponseSchema = z.object({

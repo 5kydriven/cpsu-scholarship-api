@@ -7,45 +7,31 @@ import {
 	LogoutResponseSchema,
 	MeResponseSchema,
 	RegisterSchema,
+	StudentAuthResponseSchema,
+	StudentLoginSchema,
+	StudentRegisterSchema,
+	StudentVerifyQuerySchema,
+	StudentVerifyResponseSchema,
 } from './auth.schema';
-import { login, logout, me, register } from './auth.handler';
-
-const validationError = {
-	description: 'Request validation failed',
-} as const;
-
-const unauthorized = {
-	description: 'Unauthorized',
-} as const;
-
-export const registerRoute = createRoute({
-	method: 'post',
-	path: '/register',
-	request: {
-		body: {
-			content: {
-				'application/json': {
-					schema: RegisterSchema,
-				},
-			},
-		},
-	},
-	responses: {
-		200: {
-			description: 'Registered user',
-			content: {
-				'application/json': {
-					schema: AuthResponseSchema,
-				},
-			},
-		},
-		422: validationError,
-	},
-});
+import {
+	login,
+	logout,
+	me,
+	studentLogin,
+	studentRegister,
+	studentVerify,
+} from './auth.handler';
+import {
+	conflict,
+	unauthorized,
+	validationError,
+} from '@/lib/openapi-responses';
 
 export const loginRoute = createRoute({
 	method: 'post',
 	path: '/login',
+	tags: ['Auth'],
+	summary: 'Login a user',
 	request: {
 		body: {
 			content: {
@@ -69,9 +55,86 @@ export const loginRoute = createRoute({
 	},
 });
 
+export const studentVerifyRoute = createRoute({
+	method: 'get',
+	path: '/student/verify',
+	tags: ['Auth'],
+	summary: 'Verify student auth flow by student number',
+	request: { query: StudentVerifyQuerySchema },
+	responses: {
+		200: {
+			description: 'Student auth flow status',
+			content: {
+				'application/json': {
+					schema: StudentVerifyResponseSchema,
+				},
+			},
+		},
+		422: validationError,
+	},
+});
+
+export const studentRegisterRoute = createRoute({
+	method: 'post',
+	path: '/student/register',
+	tags: ['Auth'],
+	summary: 'Register an allowlisted student',
+	request: {
+		body: {
+			content: {
+				'application/json': {
+					schema: StudentRegisterSchema,
+				},
+			},
+		},
+	},
+	responses: {
+		200: {
+			description: 'Registered student',
+			content: {
+				'application/json': {
+					schema: StudentAuthResponseSchema,
+				},
+			},
+		},
+		409: conflict,
+		422: validationError,
+	},
+});
+
+export const studentLoginRoute = createRoute({
+	method: 'post',
+	path: '/student/login',
+	tags: ['Auth'],
+	summary: 'Login a student by student number',
+	request: {
+		body: {
+			content: {
+				'application/json': {
+					schema: StudentLoginSchema,
+				},
+			},
+		},
+	},
+	responses: {
+		200: {
+			description: 'Authenticated student',
+			content: {
+				'application/json': {
+					schema: StudentAuthResponseSchema,
+				},
+			},
+		},
+		401: unauthorized,
+		422: validationError,
+	},
+});
+
 export const logoutRoute = createRoute({
 	method: 'post',
 	path: '/logout',
+	tags: ['Auth'],
+	summary: 'Logout current user',
 	responses: {
 		200: {
 			description: 'Logged out',
@@ -88,6 +151,8 @@ export const logoutRoute = createRoute({
 export const meRoute = createRoute({
 	method: 'get',
 	path: '/me',
+	tags: ['Auth'],
+	summary: 'Get current user',
 	responses: {
 		200: {
 			description: 'Current authenticated user',
@@ -103,8 +168,10 @@ export const meRoute = createRoute({
 
 export const authRoute = new OpenAPIHono<AppEnv>();
 
-authRoute.openapi(registerRoute, register);
 authRoute.openapi(loginRoute, login);
+authRoute.openapi(studentVerifyRoute, studentVerify);
+authRoute.openapi(studentRegisterRoute, studentRegister);
+authRoute.openapi(studentLoginRoute, studentLogin);
 authRoute.use('/logout', requireAuth);
 authRoute.openapi(logoutRoute, logout);
 authRoute.use('/me', requireAuth);

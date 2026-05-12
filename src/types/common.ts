@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'editor' | 'member' | 'viewer';
+import type { UserRole } from '@/constants/roles';
 
 export interface AuthUser {
 	id: string;
