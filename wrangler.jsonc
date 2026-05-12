@@ -8,30 +8,23 @@
 	"dev": {
 		"port": 3000,
 	},
-	// "kv_namespaces": [
-	//   {
-	//     "binding": "MY_KV_NAMESPACE",
-	//     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-	//   }
-	// ],
-	// "r2_buckets": [
-	//   {
-	//     "binding": "MY_BUCKET",
-	//     "bucket_name": "my-bucket"
-	//   }
-	// ],
-	// "d1_databases": [
-	//   {
-	//     "binding": "MY_DB",
-	//     "database_name": "my-database",
-	//     "database_id": ""
-	//   }
-	// ],
-	// "ai": {
-	//   "binding": "AI"
-	// },
 	"observability": {
 		"enabled": true,
-		// "head_sampling_rate": 1,
+	},
+	"env": {
+		"staging": {
+			"name": "cpsu-scholarship-api-staging",
+			"vars": {
+				"APP_ENV": "staging",
+				"BETTER_AUTH_URL": "https://cpsu-scholarship-api-staging.tagpuno619.workers.dev",
+			},
+		},
+		"production": {
+			"name": "cpsu-scholarship-api",
+			"vars": {
+				"APP_ENV": "production",
+				"BETTER_AUTH_URL": "https://cpsu-scholarship-api.tagpuno619.workers.dev",
+			},
+		},
 	},
 }
