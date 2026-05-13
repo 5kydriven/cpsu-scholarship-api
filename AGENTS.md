@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This repository is a Cloudflare Worker API starter organized around typed Hono request handling, auth/session context, and Drizzle-backed persistence. Keep new code aligned with the existing route, middleware, schema, and database boundaries.
+This repository is a Vercel Node Functions API starter organized around typed Hono request handling, auth/session context, and Drizzle-backed persistence. Keep new code aligned with the existing route, middleware, schema, and database boundaries.
 
 ## 2. Folder Structure
 
@@ -16,8 +16,7 @@ This repository is a Cloudflare Worker API starter organized around typed Hono r
   - `migrations`: generated Drizzle migration SQL and metadata; treat as generated artifacts.
 - `src/types`: shared environment, context-variable, role, pagination, and auth user types.
 - `src/constants`: reusable enum-like maps and helpers for roles and error codes.
-- Root config files (`package.json`, `tsconfig.json`, `wrangler.jsonc`, `drizzle.config.ts`): runtime, TypeScript, Worker, and migration configuration.
-- `worker-configuration.d.ts`: generated Cloudflare bindings/runtime types; avoid hand-editing.
+- Root config files (`package.json`, `tsconfig.json`, `drizzle.config.ts`): runtime, TypeScript, Vercel, and migration configuration.
 - `hono-api-architecture.md`: architectural reference. Follow it only where it matches current source, and do not assume unimplemented folders exist.
 
 ## 3. Core Behaviors & Patterns
@@ -50,7 +49,7 @@ This repository is a Cloudflare Worker API starter organized around typed Hono r
 - **Response construction**: handlers return `c.json(payload, status)` with explicit status codes. Root text responses use `c.text(...)`. Do not introduce a new response envelope without updating the matching route schemas.
 - **Error construction**: use `HTTPException` for Hono boundary guard failures already following that pattern. Use `Errors.*`/`AppError` for application-domain errors that should carry stable application error codes and details.
 - **Context variables**: if a middleware sets a new `c.set(...)` variable, add its type to `AppVariables` in `src/types/app.ts` before consuming it elsewhere.
-- **Environment bindings**: application code reads runtime values from `c.env` or `CloudflareBindings`-typed env parameters. Binding names are uppercase snake case and must stay synchronized with generated Worker types when the Worker config changes.
+- **Environment bindings**: application code reads runtime values through `getAppEnv(c)` from `src/lib/env.ts`. Binding names are uppercase snake case. `BETTER_AUTH_URL` can be provided explicitly, or derived from Vercel's `VERCEL_URL` when System Environment Variables are exposed.
 - **Comments**: source comments are rare and short. Preserve generated-file headers, and add comments only when they explain non-obvious boundary behavior or generated artifacts.
 
 ## 5. Working Agreements

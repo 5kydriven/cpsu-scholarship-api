@@ -1,12 +1,13 @@
 import type { MiddlewareHandler } from 'hono';
 import { appendAuthHeaders } from '@/lib/auth-headers';
 import { isUserRole } from '@/constants/roles';
+import { getAppEnv } from '@/lib/env';
 import { createAuth } from '../lib/auth';
 import type { AppEnv } from '../types/app';
 
 export const withAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
 	const db = c.get('db');
-	const auth = createAuth(db, c.env);
+	const auth = createAuth(db, getAppEnv(c));
 
 	const { headers, response: session } = await auth.api.getSession({
 		headers: c.req.raw.headers,

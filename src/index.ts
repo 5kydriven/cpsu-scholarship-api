@@ -6,6 +6,7 @@ import { withAuth } from '@/middleware/with-auth';
 import { authRoute } from '@/modules/auth/auth.route';
 import { coursesRoute } from '@/modules/courses/courses.route';
 import { errorHandler } from '@/middleware/error-handler';
+import { getAppEnv } from '@/lib/env';
 import { staffProfilesRoute } from '@/modules/staff_profiles/staff_profiles.route';
 import { studentAllowlistsRoute } from '@/modules/student_allowlists/student_allowlists.route';
 import type { AppEnv } from '@/types/app';
@@ -23,7 +24,7 @@ app.use(
 	'*',
 	cors({
 		origin: (origin, c) => {
-			const allowedOrigin = c.env.CORS_ORIGIN;
+			const allowedOrigin = getAppEnv(c).CORS_ORIGIN;
 
 			if (!origin) return allowedOrigin;
 			if (origin === allowedOrigin) return origin;
@@ -42,7 +43,7 @@ app.doc('/openapi.json', (c) => ({
 		title: 'CPSU Scholarship API',
 		version: '1.0.0',
 		description:
-			'Cloudflare Worker API built with Hono, Better Auth, Drizzle, and OpenAPI.',
+			'Vercel API built with Hono, Better Auth, Drizzle, and OpenAPI.',
 	},
 	servers: [
 		{

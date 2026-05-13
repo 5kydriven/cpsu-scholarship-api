@@ -13,13 +13,12 @@ dist/
 
 # deps
 node_modules/
-.wrangler
+.vercel/
 
 # env
 .env
 .env.production
 .env.staging
-.dev.vars
 
 # logs
 logs/

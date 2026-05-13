@@ -2,10 +2,11 @@
 	"name": "starter-template-hono",
 	"type": "module",
 	"scripts": {
-		"dev": "wrangler dev",
-		"deploy": "wrangler deploy --minify",
-		"deploy:staging": "wrangler deploy --env staging",
-		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
+		"dev": "vercel dev --listen 8787",
+		"deploy": "vercel deploy --prod",
+		"deploy:preview": "vercel deploy",
+		"vercel:pull": "vercel pull",
+		"vercel:build": "vercel build",
 		"docker:up": "docker compose up -d",
 		"docker:down": "docker-compose down",
 		"docker:clean": "docker-compose down -v",
@@ -16,9 +17,7 @@
 		"db:migrate:staging": "dotenv -e .env.staging -- drizzle-kit migrate",
 		"db:migrate:prod": "dotenv -e .env.production -- drizzle-kit migrate",
 		"db:studio": "bun drizzle-kit studio",
-		"typecheck": "tsc --noEmit",
-		"wrangler:cors": "wrangler secret put CORS_ORIGIN --env staging",
-		"wrangler:dburl": "wrangler secret put DATABASE_URL --env staging"
+		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@better-auth/drizzle-adapter": "^1.6.9",
@@ -35,13 +34,12 @@
 	},
 	"devDependencies": {
 		"@better-auth/cli": "^1.4.21",
-		"@cloudflare/workers-types": "^4.20260504.1",
 		"@types/node": "^25.6.0",
 		"@types/pg": "^8.20.0",
 		"dotenv-cli": "^11.0.0",
 		"drizzle-kit": "^0.31.10",
 		"tsx": "^4.21.0",
 		"typescript": "^6.0.3",
-		"wrangler": "^4.4.0"
+		"vercel": "^48.8.2"
 	}
 }

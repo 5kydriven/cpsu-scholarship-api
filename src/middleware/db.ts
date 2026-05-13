@@ -1,8 +1,10 @@
-import { MiddlewareHandler } from 'hono';
 import { createDbConnection } from '@/db';
+import { getAppEnv } from '@/lib/env';
+import type { MiddlewareHandler } from 'hono';
 
 export const dbMiddleware = (): MiddlewareHandler => async (c, next) => {
-	const { db, dispose } = await createDbConnection(c.env.DATABASE_URL);
+	const { DATABASE_URL } = getAppEnv(c);
+	const { db, dispose } = await createDbConnection(DATABASE_URL);
 	c.set('db', db);
 
 	try {

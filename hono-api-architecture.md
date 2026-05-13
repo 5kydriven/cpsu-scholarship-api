@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This repository is a Cloudflare Worker API starter built with Hono, `@hono/zod-openapi`, Better Auth, Drizzle, and PostgreSQL. The current source is organized around:
+This repository is a Vercel Node Functions API starter built with Hono, `@hono/zod-openapi`, Better Auth, Drizzle, and PostgreSQL. The current source is organized around:
 
 - `src/index.ts` as the application entry point.
 - `src/modules/{domain}` for HTTP route contracts, handlers, and schemas.
@@ -10,6 +10,7 @@ This repository is a Cloudflare Worker API starter built with Hono, `@hono/zod-o
 - `src/services` for domain orchestration and application errors.
 - `src/db/schema` and `src/db/migrations` for persistence.
 - `src/types/app.ts` for Hono bindings and context variables.
+- `src/lib/env.ts` for runtime environment resolution across local and Vercel deployments.
 
 This document describes the current structure first. Sections marked as optional or planned are patterns that can be added later; they are not required files in the current source tree.
 
@@ -63,9 +64,7 @@ Root configuration files:
 
 - `package.json`: scripts and dependencies.
 - `tsconfig.json`: TypeScript and `@/*` path alias configuration.
-- `wrangler.jsonc`: Cloudflare Worker configuration.
 - `drizzle.config.ts`: Drizzle Kit migration configuration.
-- `worker-configuration.d.ts`: generated Cloudflare binding/runtime types.
 
 ## 3. Layer Responsibilities
 
@@ -185,7 +184,7 @@ Handlers and middleware should not rebuild Better Auth manually. They should use
 `src/middleware/with-auth.ts` runs globally after `dbMiddleware()`:
 
 - Reads `db` from context.
-- Creates `auth` with `createAuth(db, c.env)`.
+- Creates `auth` with `createAuth(db, getAppEnv(c))`.
 - Calls `auth.api.getSession(...)`.
 - Sets `auth`, `user`, and `session` in context.
 - Copies returned auth headers to the response.
@@ -383,7 +382,7 @@ The error handler currently handles:
 
 `src/middleware/db.ts` owns request-time DB lifecycle:
 
-- Creates the DB connection from `c.env.DATABASE_URL`.
+- Creates the DB connection from `getAppEnv(c).DATABASE_URL`.
 - Sets `db` in context.
 - Cleans up local `pg` clients in `finally`.
 
@@ -959,9 +958,11 @@ Current scripts:
 
 ```json
 {
-	"dev": "wrangler dev",
-	"deploy": "wrangler deploy --minify",
-	"cf-typegen": "wrangler types --env-interface CloudflareBindings",
+	"dev": "vercel dev --listen 8787",
+	"deploy": "vercel deploy --prod",
+	"deploy:preview": "vercel deploy",
+	"vercel:pull": "vercel pull",
+	"vercel:build": "vercel build",
 	"docker:up": "docker compose up -d",
 	"docker:down": "docker-compose down",
 	"docker:clean": "docker-compose down -v",
@@ -992,7 +993,7 @@ Optional location:
 src/modules/ws/ws.route.ts
 ```
 
-If added, keep WebSocket state isolated from REST modules. For production, prefer Durable Objects or another durable coordination mechanism instead of in-memory room maps.
+If added, keep WebSocket state isolated from REST modules. For production, prefer a durable coordination mechanism instead of in-memory room maps.
 
 ### Cron Jobs
 
@@ -1003,7 +1004,7 @@ src/cron/index.ts
 src/cron/jobs/*.ts
 ```
 
-If added, wire scheduled handlers through the Worker export and configure schedules in `wrangler.jsonc`. Cron jobs should create their own DB connection because they do not run through HTTP middleware.
+If added, wire scheduled handlers through Vercel Cron Jobs and give them their own DB connection because they do not run through HTTP middleware.
 
 ### Future Domain Modules
 
