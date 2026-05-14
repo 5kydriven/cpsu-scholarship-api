@@ -1,13 +1,13 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 import {
-	CreateParentSchema,
+	parentInsertSchema,
 	ParentParamsSchema,
-	ParentResponseSchema,
 	ParentsCursorQuerySchema,
 	ParentsCursorResponseSchema,
+	parentSelectSchema,
 	ParentsOffsetQuerySchema,
 	ParentsOffsetResponseSchema,
-	UpdateParentSchema,
+	parentUpdateSchema,
 } from './parents.schema';
 import { unauthorized, forbidden, notFound } from '@/lib/openapi-responses';
 import { AppEnv } from '@/types/app';
@@ -20,7 +20,6 @@ import {
 	updateParent,
 } from './parents.handler';
 import { requireAuth } from '@/middleware/require-auth';
-import { requireRole } from '@/middleware/require-role';
 
 export const listParentsRoute = createRoute({
 	method: 'get',
@@ -58,7 +57,7 @@ export const getParentRoute = createRoute({
 	request: { params: ParentParamsSchema },
 	responses: {
 		200: {
-			content: { 'application/json': { schema: ParentResponseSchema } },
+			content: { 'application/json': { schema: parentSelectSchema } },
 			description: 'OK',
 		},
 	},
@@ -71,13 +70,13 @@ export const createParentRoute = createRoute({
 	summary: 'Create a new parent',
 	request: {
 		body: {
-			content: { 'application/json': { schema: CreateParentSchema } },
+			content: { 'application/json': { schema: parentInsertSchema } },
 			required: true,
 		},
 	},
 	responses: {
 		201: {
-			content: { 'application/json': { schema: ParentResponseSchema } },
+			content: { 'application/json': { schema: parentSelectSchema } },
 			description: 'Created',
 		},
 		401: unauthorized,
@@ -93,13 +92,13 @@ export const updateParentRoute = createRoute({
 	request: {
 		params: ParentParamsSchema,
 		body: {
-			content: { 'application/json': { schema: UpdateParentSchema } },
+			content: { 'application/json': { schema: parentUpdateSchema } },
 			required: true,
 		},
 	},
 	responses: {
 		200: {
-			content: { 'application/json': { schema: ParentResponseSchema } },
+			content: { 'application/json': { schema: parentSelectSchema } },
 			description: 'OK',
 		},
 		401: unauthorized,

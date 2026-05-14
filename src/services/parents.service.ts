@@ -13,6 +13,10 @@ export const createParentsService = (parentsRepo: ParentsRepo) => ({
 		return await parentsRepo.create(parent);
 	},
 
+	async createMany(parents: NewParent[]) {
+		return await parentsRepo.createMany(parents);
+	},
+
 	async update(id: string, parent: Partial<NewParent>) {
 		const parentToUpdate = await parentsRepo.findById(id);
 		if (!parentToUpdate) throw Errors.notFound('Parent not found');
