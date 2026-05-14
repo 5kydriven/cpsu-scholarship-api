@@ -12,15 +12,17 @@ import {
 } from './courses.handler';
 import {
 	CourseParamsSchema,
-	CourseResponseSchema,
 	CoursesCursorQuerySchema,
 	CoursesCursorResponseSchema,
 	CoursesOffsetQuerySchema,
 	CoursesOffsetResponseSchema,
-	CreateCourseSchema,
-	UpdateCourseSchema,
 } from './courses.schema';
 import { forbidden, notFound, unauthorized } from '@/lib/openapi-responses';
+import {
+	courseInsertSchema,
+	courseSelectSchema,
+	courseUpdateSchema,
+} from '@/db/schema';
 
 export const listCoursesRoute = createRoute({
 	method: 'get',
@@ -58,7 +60,7 @@ export const getCourseRoute = createRoute({
 	request: { params: CourseParamsSchema },
 	responses: {
 		200: {
-			content: { 'application/json': { schema: CourseResponseSchema } },
+			content: { 'application/json': { schema: courseSelectSchema } },
 			description: 'OK',
 		},
 		404: notFound,
@@ -72,13 +74,13 @@ export const createCourseRoute = createRoute({
 	summary: 'Create a course (admin/personnel only)',
 	request: {
 		body: {
-			content: { 'application/json': { schema: CreateCourseSchema } },
+			content: { 'application/json': { schema: courseInsertSchema } },
 			required: true,
 		},
 	},
 	responses: {
 		201: {
-			content: { 'application/json': { schema: CourseResponseSchema } },
+			content: { 'application/json': { schema: courseSelectSchema } },
 			description: 'Created',
 		},
 		401: unauthorized,
@@ -94,13 +96,13 @@ export const updateCourseRoute = createRoute({
 	request: {
 		params: CourseParamsSchema,
 		body: {
-			content: { 'application/json': { schema: UpdateCourseSchema } },
+			content: { 'application/json': { schema: courseUpdateSchema } },
 			required: true,
 		},
 	},
 	responses: {
 		200: {
-			content: { 'application/json': { schema: CourseResponseSchema } },
+			content: { 'application/json': { schema: courseSelectSchema } },
 			description: 'OK',
 		},
 		401: unauthorized,
