@@ -7,9 +7,9 @@ import {
 	ScholarshipProgramsCursorQuerySchema,
 	ScholarshipProgramsCursorResponseSchema,
 	ScholarshipProgramParamsSchema,
-	ScholarshipProgramResponseSchema,
-	CreateScholarshipProgramSchema,
-	UpdateScholarshipProgramSchema,
+	ScholarshipProgramSelectSchema,
+	ScholarshipProgramInsertSchema,
+	ScholarshipProgramUpdateSchema,
 } from './scholarship_programs.schema';
 import {
 	listScholarshipPrograms,
@@ -63,7 +63,7 @@ export const getScholarshipProgramRoute = createRoute({
 	responses: {
 		200: {
 			content: {
-				'application/json': { schema: ScholarshipProgramResponseSchema },
+				'application/json': { schema: ScholarshipProgramSelectSchema },
 			},
 			description: 'OK',
 		},
@@ -79,7 +79,7 @@ export const createScholarshipProgramRoute = createRoute({
 	request: {
 		body: {
 			content: {
-				'application/json': { schema: CreateScholarshipProgramSchema },
+				'application/json': { schema: ScholarshipProgramInsertSchema },
 			},
 			required: true,
 		},
@@ -87,7 +87,7 @@ export const createScholarshipProgramRoute = createRoute({
 	responses: {
 		201: {
 			content: {
-				'application/json': { schema: ScholarshipProgramResponseSchema },
+				'application/json': { schema: ScholarshipProgramSelectSchema },
 			},
 			description: 'Created',
 		},
@@ -105,7 +105,7 @@ export const updateScholarshipProgramRoute = createRoute({
 		params: ScholarshipProgramParamsSchema,
 		body: {
 			content: {
-				'application/json': { schema: UpdateScholarshipProgramSchema },
+				'application/json': { schema: ScholarshipProgramUpdateSchema },
 			},
 			required: true,
 		},
@@ -113,7 +113,7 @@ export const updateScholarshipProgramRoute = createRoute({
 	responses: {
 		200: {
 			content: {
-				'application/json': { schema: ScholarshipProgramResponseSchema },
+				'application/json': { schema: ScholarshipProgramSelectSchema },
 			},
 			description: 'OK',
 		},
