@@ -9,5 +9,7 @@ export const FileUploadSchema = z.object({
 });
 
 export const FileResponseSchema = z.object({
-	url: z.string(),
+	url: z.string().openapi({
+		example: 'applications/a1b2c3/document.pdf',
+	}),
 });

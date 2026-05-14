@@ -1,10 +1,13 @@
 import z from 'zod';
 import { createSchemaFactory } from 'drizzle-zod';
-import { addresses, applications, parents } from '@/db/schema';
+import { applications } from '@/db/schema';
 import { courseSelectSchema } from '../courses/courses.schema';
-import { parentSelectSchema } from '../parents/parents.schema';
+import { parentInsertSchema, parentSelectSchema } from '../parents/parents.schema';
 import { ProgramOfferingResponseSchema } from '../program_offerings/program_offerings.schema';
-import { AddressSelectSchema } from '../addresses/addresses.schema';
+import {
+	AddressInsertSchema,
+	AddressSelectSchema,
+} from '../addresses/addresses.schema';
 
 const { createInsertSchema, createUpdateSchema, createSelectSchema } =
 	createSchemaFactory({ zodInstance: z });
@@ -13,20 +16,58 @@ export const ApplicationsParamsSchema = z.object({
 	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
 });
 
-export const applicationSelectSchema = createSelectSchema(applications);
+const applicationSchemaExamples = {
+	id: (schema: any) =>
+		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+	studentId: (schema: any) =>
+		schema.openapi({ example: 'b2c3d4e5-f6a7-8901-bcde-f23456789012' }),
+	offeringId: (schema: any) =>
+		schema.openapi({ example: 'c3d4e5f6-a7b8-9012-cdef-345678901234' }),
+	courseId: (schema: any) =>
+		schema.openapi({ example: 'd4e5f6a7-b8c9-0123-defa-456789012345' }),
+	firstName: (schema: any) => schema.openapi({ example: 'Maria' }),
+	lastName: (schema: any) => schema.openapi({ example: 'Santos' }),
+	middleName: (schema: any) => schema.openapi({ example: 'Reyes' }),
+	extName: (schema: any) => schema.openapi({ example: 'Jr.' }),
+	gender: (schema: any) => schema.openapi({ example: 'female' }),
+	birthdate: (schema: any) => schema.openapi({ example: '2005-08-14' }),
+	yearLevel: (schema: any) => schema.openapi({ example: '2nd Year' }),
+	gwa: (schema: any) => schema.openapi({ example: '1.75' }),
+	citizenship: (schema: any) => schema.openapi({ example: 'Filipino' }),
+	birthplace: (schema: any) => schema.openapi({ example: 'San Carlos City' }),
+	email: (schema: any) => schema.openapi({ example: 'maria.santos@example.com' }),
+	numberOfSiblings: (schema: any) => schema.openapi({ example: '3' }),
+	contactNumber: (schema: any) => schema.openapi({ example: '+639171234567' }),
+	schoolSector: (schema: any) => schema.openapi({ example: 'public' }),
+	schoolName: (schema: any) =>
+		schema.openapi({ example: 'Central Philippines State University' }),
+	schoolAddress: (schema: any) =>
+		schema.openapi({ example: 'San Carlos City, Negros Occidental' }),
+	otherFinancialAssistance: (schema: any) =>
+		schema.openapi({ example: 'Barangay scholarship' }),
+	pwdUrl: (schema: any) =>
+		schema.openapi({ example: 'applications/a1b2c3/pwd-certificate.pdf' }),
+	ipUrl: (schema: any) =>
+		schema.openapi({ example: 'applications/a1b2c3/ip-certificate.pdf' }),
+	fourPsUrl: (schema: any) =>
+		schema.openapi({ example: 'applications/a1b2c3/fourps-certificate.pdf' }),
+	createdAt: (schema: any) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	updatedAt: (schema: any) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+};
 
-const nestedAddressInsertSchema = createInsertSchema(addresses).omit({
-	id: true,
+export const applicationSelectSchema = createSelectSchema(
+	applications,
+	applicationSchemaExamples,
+);
+
+const nestedAddressInsertSchema = AddressInsertSchema.omit({
 	applicationId: true,
-	createdAt: true,
-	updatedAt: true,
 });
 
-const nestedParentInsertSchema = createInsertSchema(parents).omit({
-	id: true,
+const nestedParentInsertSchema = parentInsertSchema.omit({
 	applicationId: true,
-	createdAt: true,
-	updatedAt: true,
 });
 
 export const applicationWithRelationsSchema = applicationSelectSchema
@@ -41,7 +82,10 @@ export const applicationWithRelationsSchema = applicationSelectSchema
 		courseId: true,
 	});
 
-export const applicationInsertSchema = createInsertSchema(applications, {})
+export const applicationInsertSchema = createInsertSchema(
+	applications,
+	applicationSchemaExamples,
+)
 	.omit({
 		id: true,
 		createdAt: true,

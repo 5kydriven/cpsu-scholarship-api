@@ -1,41 +1,71 @@
+import { programOfferings } from '@/db/schema';
 import {
 	OffsetMetaSchema,
 	CursorMetaSchema,
 	OffsetQuerySchema,
 	CursorQuerySchema,
 } from '@/lib/pagination';
+import { createSchemaFactory } from 'drizzle-zod';
 import z from 'zod';
+
+const { createInsertSchema, createUpdateSchema, createSelectSchema } =
+	createSchemaFactory({ zodInstance: z });
 
 export const ProgramOfferingParamsSchema = z.object({
 	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
 });
 
-export const CreateProgramOfferingSchema = z.object({
-	scholarshipProgramId: z
-		.uuid()
-		.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
-	schoolYear: z.string().max(20).openapi({ example: '2023 - 2024' }),
-	totalBudget: z.string().openapi({ example: 1000000.0 }),
-	isActive: z.boolean().default(true).openapi({ example: true }),
-	isArchived: z.boolean().default(false).openapi({ example: false }),
+export const ProgramOfferingResponseSchema = createSelectSchema(
+	programOfferings,
+	{
+		id: (schema) =>
+			schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+		scholarshipProgramId: (schema) =>
+			schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+		schoolYear: (schema) =>
+			schema.max(20).openapi({ example: '2023 - 2024' }),
+		totalBudget: (schema) => schema.openapi({ example: '1000000.00' }),
+		isActive: (schema) => schema.openapi({ example: true }),
+		isArchived: (schema) => schema.openapi({ example: false }),
+		createdAt: (schema) =>
+			schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+		updatedAt: (schema) =>
+			schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	},
+);
+
+export const CreateProgramOfferingSchema = createInsertSchema(programOfferings, {
+	scholarshipProgramId: (schema) =>
+		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+	schoolYear: (schema) => schema.max(20).openapi({ example: '2023 - 2024' }),
+	totalBudget: (schema) => schema.openapi({ example: '1000000.00' }),
+	isActive: (schema) => schema.openapi({ example: true }),
+	isArchived: (schema) => schema.openapi({ example: false }),
+}).omit({
+	id: true,
+	createdAt: true,
+	updatedAt: true,
 });
 
-export const UpdateProgramOfferingSchema =
-	CreateProgramOfferingSchema.partial().refine(
-		(v) => Object.keys(v).length > 0,
+export const UpdateProgramOfferingSchema = createUpdateSchema(programOfferings, {
+	scholarshipProgramId: (schema) =>
+		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+	schoolYear: (schema) => schema.max(20).openapi({ example: '2023 - 2024' }),
+	totalBudget: (schema) => schema.openapi({ example: '1000000.00' }),
+	isActive: (schema) => schema.openapi({ example: true }),
+	isArchived: (schema) => schema.openapi({ example: false }),
+})
+	.omit({
+		id: true,
+		createdAt: true,
+		updatedAt: true,
+	})
+	.refine(
+		(value) => Object.keys(value).length > 0,
 		{
 			message: 'At least one program offering field is required',
 		},
 	);
-
-export const ProgramOfferingResponseSchema = z.object({
-	id: z.uuid(),
-	scholarshipProgramId: z.uuid().nullable(),
-	schoolYear: z.string(),
-	isArchived: z.boolean(),
-	createdAt: z.string(),
-	updatedAt: z.string(),
-});
 
 export const ProgramOfferingsOffsetResponseSchema = z.object({
 	data: ProgramOfferingResponseSchema.array(),
@@ -57,10 +87,3 @@ export const ProgramOfferingsOffsetQuerySchema = OffsetQuerySchema.extend({
 });
 
 export const ProgramOfferingsCursorQuerySchema = CursorQuerySchema;
-
-export type UpdateProgramOfferingInput = z.infer<
-	typeof UpdateProgramOfferingSchema
->;
-export type CreateProgramOfferingInput = z.infer<
-	typeof CreateProgramOfferingSchema
->;

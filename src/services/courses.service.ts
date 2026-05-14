@@ -1,8 +1,5 @@
+import type { NewCourse } from '@/db/schema';
 import { Errors } from '@/lib/errors';
-import {
-	CreateCourseInput,
-	UpdateCourseInput,
-} from '@/modules/courses/courses.schema';
 import type { CoursesRepo } from '@/repositories/courses.repo';
 
 export const createCoursesService = (coursesRepo: CoursesRepo) => ({
@@ -12,7 +9,7 @@ export const createCoursesService = (coursesRepo: CoursesRepo) => ({
 		return course;
 	},
 
-	async create(data: CreateCourseInput) {
+	async create(data: NewCourse) {
 		return coursesRepo.create({
 			name: data.name,
 			abbreviation: data.abbreviation,
@@ -20,7 +17,7 @@ export const createCoursesService = (coursesRepo: CoursesRepo) => ({
 		});
 	},
 
-	async update(id: string, data: UpdateCourseInput) {
+	async update(id: string, data: Partial<NewCourse>) {
 		const course = await coursesRepo.update(id, data);
 		if (!course) throw Errors.notFound('Course not found');
 		return course;

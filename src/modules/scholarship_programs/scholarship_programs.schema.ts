@@ -15,11 +15,28 @@ export const ScholarshipProgramParamsSchema = z.object({
 	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
 });
 
-export const ScholarshipProgramSelectSchema =
-	createSelectSchema(scholarshipPrograms);
+const scholarshipProgramSchemaExamples = {
+	id: (schema: any) =>
+		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+	name: (schema: any) =>
+		schema.openapi({ example: 'Tertiary Education Subsidy' }),
+	description: (schema: any) =>
+		schema.openapi({ example: 'Financial assistance for eligible students' }),
+	isArchived: (schema: any) => schema.openapi({ example: false }),
+	createdAt: (schema: any) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	updatedAt: (schema: any) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+};
+
+export const ScholarshipProgramSelectSchema = createSelectSchema(
+	scholarshipPrograms,
+	scholarshipProgramSchemaExamples,
+);
 
 export const ScholarshipProgramInsertSchema = createInsertSchema(
 	scholarshipPrograms,
+	scholarshipProgramSchemaExamples,
 ).omit({
 	id: true,
 	createdAt: true,
@@ -28,6 +45,7 @@ export const ScholarshipProgramInsertSchema = createInsertSchema(
 
 export const ScholarshipProgramUpdateSchema = createUpdateSchema(
 	scholarshipPrograms,
+	scholarshipProgramSchemaExamples,
 ).omit({
 	id: true,
 	createdAt: true,

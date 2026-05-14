@@ -14,7 +14,7 @@ export const createStaffProfilesService = (
 		lastName: string;
 		department: string;
 		position: string;
-		contactNumber?: string;
+		contactNumber?: string | null;
 	}) {
 		try {
 			const user = await staffProfilesRepo.updateUserRole(

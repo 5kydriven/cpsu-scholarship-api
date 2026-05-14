@@ -16,15 +16,18 @@ export const CreateStudentAllowlistsSchema = z.object({
 });
 
 export const StudentAllowlistsResponseSchema = z.object({
-	id: z.uuid(),
-	studentNumber: z.string(),
-	name: z.string().nullable(),
-	isRegistered: z.boolean(),
-	uploadedBy: z.string().nullable(),
-	registeredUserId: z.string().nullable(),
-	registeredAt: z.string().nullable(),
-	createdAt: z.string(),
-	updatedAt: z.string(),
+	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+	studentNumber: z.string().openapi({ example: '2025-0015-R' }),
+	name: z.string().nullable().openapi({ example: 'Dela Cruz, John' }),
+	isRegistered: z.boolean().openapi({ example: false }),
+	uploadedBy: z.string().nullable().openapi({ example: 'user_123' }),
+	registeredUserId: z.string().nullable().openapi({ example: 'user_456' }),
+	registeredAt: z
+		.string()
+		.nullable()
+		.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	createdAt: z.string().openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	updatedAt: z.string().openapi({ example: '2026-05-09T12:00:00.000Z' }),
 });
 
 export const StudentAllowlistImportBodySchema = z.object({

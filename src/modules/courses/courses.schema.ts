@@ -16,12 +16,18 @@ export const CourseParamsSchema = z.object({
 });
 
 export const courseSelectSchema = createSelectSchema(courses, {
+	id: (schema) =>
+		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
 	name: (schema) =>
 		schema.openapi({
 			example: 'Bacgelor of Science in Information Technology',
 		}),
 	abbreviation: (schema) => schema.openapi({ example: 'BSIT' }),
 	major: (schema) => schema.openapi({ example: 'Programming' }),
+	createdAt: (schema) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	updatedAt: (schema) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
 });
 
 export const courseInsertSchema = createInsertSchema(courses, {
