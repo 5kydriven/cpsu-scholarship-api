@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export const FileSchema = z.object({
+export const FileUploadSchema = z.object({
 	file: z.any().openapi({
 		type: 'string',
 		format: 'binary',

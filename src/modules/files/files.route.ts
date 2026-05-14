@@ -8,7 +8,7 @@ import { requireAuth } from '@/middleware/require-auth';
 import type { AppEnv } from '@/types/app';
 
 import { createFile } from './files.handler';
-import { FileResponseSchema, FileSchema } from './files.schema';
+import { FileResponseSchema, FileUploadSchema } from './files.schema';
 
 export const createFileRoute = createRoute({
 	method: 'post',
@@ -17,7 +17,7 @@ export const createFileRoute = createRoute({
 	summary: 'Upload a File',
 	request: {
 		body: {
-			content: { 'multipart/form-data': { schema: FileSchema } },
+			content: { 'multipart/form-data': { schema: FileUploadSchema } },
 			required: true,
 		},
 	},
