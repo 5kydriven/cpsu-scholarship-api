@@ -1,13 +1,14 @@
 -- Creates or updates one Better Auth email/password admin account.
 -- Generate a compatible password hash with:
--- bun -e "import { hashPassword } from 'better-auth/crypto'; console.log(await hashPassword('ChangeMeAdmin123!'))"
+-- bun -e "import { hashPassword } from './src/utils/crypto.ts'; console.log(await hashPassword('ChangeMeAdmin123!'))"
+-- bun -e "import { hashPassword } from './src/utils/crypto.ts'; console.log(await hashPassword('password'))"
 
 DO $$
 DECLARE
-	admin_user_id text := 'admin_user_001';
+	admin_user_id text := 'admin_user_002';
 	admin_name text := 'Admin User';
-	admin_email text := 'admin@example.com';
-	admin_password_hash text := 'a1d1ff70e567189c86be70a9853de7bd:80155c9cf8465ac207b8b8dcb0794dbdcc9f40e07b4c27e3ceab92b67d6a5074265cda152e0d4b824b6f42fb52ae36c41c48c414817d794660f8600f5cdc3011';
+	admin_email text := 'admin1@example.com';
+	admin_password_hash text := 'c903a23cfc1c4b6578b0b384f20f47d8:aab2cb7e373b2c0b2ea46fb80a0d688ef9f3545991fd3693b48856b960b7872f7e286f45cf4b876839b3c589e3b0075ce315e553e7fccb6085d8ae280e234a60';
 	actual_user_id text;
 BEGIN
 	IF admin_password_hash = 'REPLACE_WITH_BETTER_AUTH_PASSWORD_HASH' THEN
