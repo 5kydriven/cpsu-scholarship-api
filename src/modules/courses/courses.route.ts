@@ -11,18 +11,16 @@ import {
 	updateCourse,
 } from './courses.handler';
 import {
+	courseInsertSchema,
 	CourseParamsSchema,
 	CoursesCursorQuerySchema,
 	CoursesCursorResponseSchema,
+	courseSelectSchema,
 	CoursesOffsetQuerySchema,
 	CoursesOffsetResponseSchema,
+	courseUpdateSchema,
 } from './courses.schema';
 import { forbidden, notFound, unauthorized } from '@/lib/openapi-responses';
-import {
-	courseInsertSchema,
-	courseSelectSchema,
-	courseUpdateSchema,
-} from '@/db/schema';
 
 export const listCoursesRoute = createRoute({
 	method: 'get',
