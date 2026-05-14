@@ -1,16 +1,24 @@
 import { Db } from '@/db';
-import { applications, NewApplication } from '@/db/schema';
+import { applications, NewApplication, NewParent, parents } from '@/db/schema';
 import { decodeCursor, encodeCursor } from '@/lib/pagination';
 import { and, asc, count, desc, eq, gt, ilike, lt, or } from 'drizzle-orm';
 
+const applicationWithRelations = {
+	addresses: true,
+	parents: true,
+	offering: true,
+	student: true,
+	course: true,
+} as const;
+
 export const createApplicationsRepo = (db: Db) => ({
 	findById: (id: string) =>
-		db
-			.select()
-			.from(applications)
-			.where(eq(applications.id, id))
-			.limit(1)
-			.then((r) => r[0] ?? null),
+		db.query.applications
+			.findFirst({
+				where: eq(applications.id, id),
+				with: applicationWithRelations,
+			})
+			.then((r) => r ?? null),
 
 	create: (data: NewApplication) =>
 		db
@@ -68,13 +76,13 @@ export const createApplicationsRepo = (db: Db) => ({
 				: desc(applications[sortField]);
 
 		const [rows, [{ value: total }]] = await Promise.all([
-			db
-				.select()
-				.from(applications)
-				.where(where)
-				.orderBy(orderBy)
-				.limit(perPage)
-				.offset(offset),
+			db.query.applications.findMany({
+				where,
+				orderBy,
+				limit: perPage,
+				offset,
+				with: applicationWithRelations,
+			}),
 			db.select({ value: count() }).from(applications).where(where),
 		]);
 
@@ -95,14 +103,13 @@ export const createApplicationsRepo = (db: Db) => ({
 				: lt(applications.id, decodedCursor.id)
 			: undefined;
 
-		const rows = await db
-			.select()
-			.from(applications)
-			.where(where)
-			.orderBy(
+		const rows = await db.query.applications.findMany({
+			where,
+			orderBy:
 				direction === 'next' ? asc(applications.id) : desc(applications.id),
-			)
-			.limit(perPage + 1);
+			limit: perPage + 1,
+			with: applicationWithRelations,
+		});
 		const hasMore = rows.length > perPage;
 		if (hasMore) rows.pop();
 
