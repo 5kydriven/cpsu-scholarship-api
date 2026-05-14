@@ -7,9 +7,9 @@ import {
 	AddressesCursorQuerySchema,
 	AddressesCursorResponseSchema,
 	AddressesParamsSchema,
-	AddressResponseSchema,
-	CreateAddressSchema,
-	UpdateAddressSchema,
+	AddressSelectSchema,
+	AddressInsertSchema,
+	AddressUpdateSchema,
 } from './addresses.schema';
 import {
 	listAddresses,
@@ -60,7 +60,7 @@ export const getAddressRoute = createRoute({
 	request: { params: AddressesParamsSchema },
 	responses: {
 		200: {
-			content: { 'application/json': { schema: AddressResponseSchema } },
+			content: { 'application/json': { schema: AddressSelectSchema } },
 			description: 'OK',
 		},
 		404: notFound,
@@ -74,13 +74,13 @@ export const createAddressRoute = createRoute({
 	summary: 'Create a new address',
 	request: {
 		body: {
-			content: { 'application/json': { schema: CreateAddressSchema } },
+			content: { 'application/json': { schema: AddressInsertSchema } },
 			required: true,
 		},
 	},
 	responses: {
 		201: {
-			content: { 'application/json': { schema: AddressResponseSchema } },
+			content: { 'application/json': { schema: AddressSelectSchema } },
 			description: 'Created',
 		},
 		401: unauthorized,
@@ -96,13 +96,13 @@ export const updateAddressRoute = createRoute({
 	request: {
 		params: AddressesParamsSchema,
 		body: {
-			content: { 'application/json': { schema: UpdateAddressSchema } },
+			content: { 'application/json': { schema: AddressUpdateSchema } },
 			required: true,
 		},
 	},
 	responses: {
 		200: {
-			content: { 'application/json': { schema: AddressResponseSchema } },
+			content: { 'application/json': { schema: AddressSelectSchema } },
 			description: 'OK',
 		},
 		401: unauthorized,
