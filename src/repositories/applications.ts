@@ -1,7 +1,7 @@
-import { Db } from '@/db';
-import { applications, NewApplication, NewParent, parents } from '@/db/schema';
+import type { Db } from '@/db';
+import { applications, type NewApplication } from '@/db/schema';
 import { decodeCursor, encodeCursor } from '@/lib/pagination';
-import { and, asc, count, desc, eq, gt, ilike, lt, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, ilike, inArray, lt, or } from 'drizzle-orm';
 
 const applicationWithRelations = {
 	addresses: true,
@@ -20,6 +20,14 @@ export const createApplicationsRepo = (db: Db) => ({
 			})
 			.then((r) => r ?? null),
 
+	findManyByIds: (ids: string[]) =>
+		ids.length === 0
+			? Promise.resolve([])
+			: db.query.applications.findMany({
+					where: inArray(applications.id, ids),
+					with: applicationWithRelations,
+				}),
+
 	create: (data: NewApplication) =>
 		db
 			.insert(applications)
@@ -34,6 +42,25 @@ export const createApplicationsRepo = (db: Db) => ({
 			.where(eq(applications.id, id))
 			.returning()
 			.then((r) => r[0] ?? null),
+
+	acceptMany: async (ids: string[], reviewedBy: string, reviewedAt: string) => {
+		if (ids.length === 0) return [];
+
+		await db
+			.update(applications)
+			.set({
+				status: 'approved',
+				reviewedBy,
+				reviewedAt,
+				updatedAt: reviewedAt,
+			})
+			.where(inArray(applications.id, ids));
+
+		return db.query.applications.findMany({
+			where: inArray(applications.id, ids),
+			with: applicationWithRelations,
+		});
+	},
 
 	delete: (id: string) =>
 		db

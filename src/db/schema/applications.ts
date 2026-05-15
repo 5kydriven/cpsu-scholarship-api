@@ -13,8 +13,8 @@ import { courses } from './course';
 import { parents } from './parents';
 import { payouts } from './payouts';
 import { programOfferings } from './program_offerings';
-import { staffProfiles } from './staff_profiles';
 import { student } from './student';
+import { user } from './auth';
 
 export const applicationStatusEnum = pgEnum('application_status', [
 	'pending',
@@ -55,7 +55,7 @@ export const applications = pgTable(
 		ipUrl: text('ip_url'),
 		fourPsUrl: text('fourps_url'),
 		status: applicationStatusEnum('status').default('pending').notNull(),
-		reviewedBy: uuid('reviewed_by').references(() => staffProfiles.id),
+		reviewedBy: text('reviewed_by').references(() => user.id),
 		reviewedAt: timestamp('reviewed_at', {
 			withTimezone: true,
 			mode: 'string',
@@ -96,9 +96,9 @@ export const applicationsRelations = relations(
 			fields: [applications.courseId],
 			references: [courses.id],
 		}),
-		reviewer: one(staffProfiles, {
+		reviewer: one(user, {
 			fields: [applications.reviewedBy],
-			references: [staffProfiles.id],
+			references: [user.id],
 		}),
 	}),
 );

@@ -10,10 +10,30 @@ import {
 	AddressInsertSchema,
 	AddressSelectSchema,
 } from '../addresses/addresses.schema';
-import { generatedFields, UuidIdParamsSchema } from '@/lib/common-schemas';
+import {
+	createCursorResponseSchema,
+	createOffsetResponseSchema,
+	generatedFields,
+	UuidIdParamsSchema,
+} from '@/lib/common-schemas';
 import { createInsertSchema, createSelectSchema } from '@/lib/drizzle-zod';
+import { OffsetQuerySchema } from '@/lib/pagination';
 
 export const ApplicationsParamsSchema = UuidIdParamsSchema;
+
+export const acceptApplicationsBodySchema = z.object({
+	ids: z
+		.uuid()
+		.array()
+		.min(1)
+		.openapi({
+			description: 'Application IDs to accept',
+			example: [
+				'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+				'b2c3d4e5-f6a7-8901-bcde-f23456789012',
+			],
+		}),
+});
 
 const applicationSchemaExamples = {
 	id: (schema: any) =>
@@ -83,12 +103,34 @@ export const applicationWithRelationsSchema = applicationSelectSchema
 		courseId: true,
 	});
 
+export const acceptApplicationsResponseSchema = z.object({
+	data: applicationWithRelationsSchema.array(),
+});
+
+export const ApplicationsOffsetResponseSchema =
+	createOffsetResponseSchema(applicationWithRelationsSchema);
+
+export const ApplicationsCursorResponseSchema =
+	createCursorResponseSchema(applicationWithRelationsSchema);
+
+export const ApplicationsOffsetQuerySchema = OffsetQuerySchema.extend({
+	search: z.string().optional().openapi({ example: 'Maria Santos' }),
+	sort: z
+		.enum(['firstName', 'lastName', 'middleName', 'createdAt'])
+		.default('createdAt')
+		.openapi({ example: 'createdAt' }),
+	order: z.enum(['asc', 'desc']).default('desc').openapi({ example: 'desc' }),
+});
+
 export const applicationInsertSchema = createInsertSchema(
 	applications,
 	applicationSchemaExamples,
 )
 	.omit({
 		...generatedFields,
+		status: true,
+		reviewedBy: true,
+		reviewedAt: true,
 	})
 	.extend({
 		addresses: applicationAddressInputSchema.array().min(1).max(2).openapi({
