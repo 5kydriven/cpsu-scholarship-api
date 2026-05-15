@@ -1,4 +1,12 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
+import {
+	deletedNoContent,
+	jsonBody,
+	jsonCreated,
+	jsonOk,
+} from '@/lib/openapi-helpers';
+import { forbidden, notFound, unauthorized } from '@/lib/openapi-responses';
+import { CursorQuerySchema } from '@/lib/pagination';
 import { requireAuth } from '@/middleware/require-auth';
 import { requireRole } from '@/middleware/require-role';
 import type { AppEnv } from '@/types/app';
@@ -13,14 +21,12 @@ import {
 import {
 	courseInsertSchema,
 	CourseParamsSchema,
-	CoursesCursorQuerySchema,
 	CoursesCursorResponseSchema,
 	courseSelectSchema,
 	CoursesOffsetQuerySchema,
 	CoursesOffsetResponseSchema,
 	courseUpdateSchema,
 } from './courses.schema';
-import { forbidden, notFound, unauthorized } from '@/lib/openapi-responses';
 
 export const listCoursesRoute = createRoute({
 	method: 'get',
@@ -29,10 +35,7 @@ export const listCoursesRoute = createRoute({
 	summary: 'List courses (offset pagination)',
 	request: { query: CoursesOffsetQuerySchema },
 	responses: {
-		200: {
-			content: { 'application/json': { schema: CoursesOffsetResponseSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(CoursesOffsetResponseSchema),
 	},
 });
 
@@ -41,12 +44,9 @@ export const listCoursesCursorRoute = createRoute({
 	path: '/cursor',
 	tags: ['Courses'],
 	summary: 'List courses (cursor pagination)',
-	request: { query: CoursesCursorQuerySchema },
+	request: { query: CursorQuerySchema },
 	responses: {
-		200: {
-			content: { 'application/json': { schema: CoursesCursorResponseSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(CoursesCursorResponseSchema),
 	},
 });
 
@@ -57,10 +57,7 @@ export const getCourseRoute = createRoute({
 	summary: 'Get course by ID',
 	request: { params: CourseParamsSchema },
 	responses: {
-		200: {
-			content: { 'application/json': { schema: courseSelectSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(courseSelectSchema),
 		404: notFound,
 	},
 });
@@ -71,16 +68,10 @@ export const createCourseRoute = createRoute({
 	tags: ['Courses'],
 	summary: 'Create a course (admin/personnel only)',
 	request: {
-		body: {
-			content: { 'application/json': { schema: courseInsertSchema } },
-			required: true,
-		},
+		body: jsonBody(courseInsertSchema),
 	},
 	responses: {
-		201: {
-			content: { 'application/json': { schema: courseSelectSchema } },
-			description: 'Created',
-		},
+		201: jsonCreated(courseSelectSchema),
 		401: unauthorized,
 		403: forbidden,
 	},
@@ -93,16 +84,10 @@ export const updateCourseRoute = createRoute({
 	summary: 'Update a course (admin/personnel only)',
 	request: {
 		params: CourseParamsSchema,
-		body: {
-			content: { 'application/json': { schema: courseUpdateSchema } },
-			required: true,
-		},
+		body: jsonBody(courseUpdateSchema),
 	},
 	responses: {
-		200: {
-			content: { 'application/json': { schema: courseSelectSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(courseSelectSchema),
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,
@@ -116,7 +101,7 @@ export const deleteCourseRoute = createRoute({
 	summary: 'Delete a course (admin/personnel only)',
 	request: { params: CourseParamsSchema },
 	responses: {
-		204: { description: 'Deleted' },
+		204: deletedNoContent,
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,

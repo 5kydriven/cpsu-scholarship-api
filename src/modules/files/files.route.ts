@@ -1,4 +1,5 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
+import { jsonCreated } from '@/lib/openapi-helpers';
 import {
 	forbidden,
 	unauthorized,
@@ -22,10 +23,7 @@ export const createFileRoute = createRoute({
 		},
 	},
 	responses: {
-		201: {
-			content: { 'application/json': { schema: FileResponseSchema } },
-			description: 'Created',
-		},
+		201: jsonCreated(FileResponseSchema),
 		401: unauthorized,
 		403: forbidden,
 		422: validationError,

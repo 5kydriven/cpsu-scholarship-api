@@ -1,10 +1,11 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
-import { requireAuth } from '@/middleware/require-auth';
+import { jsonBody, jsonCreated } from '@/lib/openapi-helpers';
 import {
 	conflict,
 	unauthorized,
 	validationError,
 } from '@/lib/openapi-responses';
+import { requireAuth } from '@/middleware/require-auth';
 import type { AppEnv } from '@/types/app';
 import { createApplication } from './applications.handler';
 import {
@@ -18,22 +19,10 @@ export const createApplicationRoute = createRoute({
 	tags: ['Applications'],
 	summary: 'Create an application with required parent records',
 	request: {
-		body: {
-			content: {
-				'application/json': {
-					schema: applicationInsertSchema,
-				},
-			},
-			required: true,
-		},
+		body: jsonBody(applicationInsertSchema),
 	},
 	responses: {
-		201: {
-			content: {
-				'application/json': { schema: applicationWithRelationsSchema },
-			},
-			description: 'Created',
-		},
+		201: jsonCreated(applicationWithRelationsSchema),
 		401: unauthorized,
 		409: conflict,
 		422: validationError,

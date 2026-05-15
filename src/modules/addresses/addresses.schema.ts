@@ -1,19 +1,19 @@
 import { addresses } from '@/db/schema';
+import { OffsetQuerySchema } from '@/lib/pagination';
 import {
-	OffsetMetaSchema,
-	CursorMetaSchema,
-	OffsetQuerySchema,
-	CursorQuerySchema,
-} from '@/lib/pagination';
-import { createSchemaFactory } from 'drizzle-zod';
+	createCursorResponseSchema,
+	createOffsetResponseSchema,
+	generatedFields,
+	UuidIdParamsSchema,
+} from '@/lib/common-schemas';
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from '@/lib/drizzle-zod';
 import z from 'zod';
 
-const { createInsertSchema, createUpdateSchema, createSelectSchema } =
-	createSchemaFactory({ zodInstance: z });
-
-export const AddressesParamsSchema = z.object({
-	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
-});
+export const AddressesParamsSchema = UuidIdParamsSchema;
 
 export const addressSchemaExamples = {
 	id: (schema: any) =>
@@ -42,29 +42,21 @@ export const AddressInsertSchema = createInsertSchema(
 	addresses,
 	addressSchemaExamples,
 ).omit({
-	id: true,
-	createdAt: true,
-	updatedAt: true,
+	...generatedFields,
 });
 
 export const AddressUpdateSchema = createUpdateSchema(
 	addresses,
 	addressSchemaExamples,
 ).omit({
-	id: true,
-	createdAt: true,
-	updatedAt: true,
+	...generatedFields,
 });
 
-export const AddressesOffsetResponseSchema = z.object({
-	data: AddressSelectSchema.array(),
-	meta: OffsetMetaSchema,
-});
+export const AddressesOffsetResponseSchema =
+	createOffsetResponseSchema(AddressSelectSchema);
 
-export const AddressesCursorResponseSchema = z.object({
-	data: AddressSelectSchema.array(),
-	meta: CursorMetaSchema,
-});
+export const AddressesCursorResponseSchema =
+	createCursorResponseSchema(AddressSelectSchema);
 
 export const AddressesOffsetQuerySchema = OffsetQuerySchema.extend({
 	search: z.string().optional().openapi({ example: 'Jl. Raya' }),
@@ -74,5 +66,3 @@ export const AddressesOffsetQuerySchema = OffsetQuerySchema.extend({
 		.openapi({ example: 'createdAt' }),
 	order: z.enum(['asc', 'desc']).default('desc').openapi({ example: 'desc' }),
 });
-
-export const AddressesCursorQuerySchema = CursorQuerySchema;

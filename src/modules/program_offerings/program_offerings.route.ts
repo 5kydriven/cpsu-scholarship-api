@@ -1,18 +1,24 @@
-import { notFound, unauthorized, forbidden } from '@/lib/openapi-responses';
-import { AppEnv } from '@/types/app';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
+import {
+	deletedNoContent,
+	jsonBody,
+	jsonCreated,
+	jsonOk,
+} from '@/lib/openapi-helpers';
+import { forbidden, notFound, unauthorized } from '@/lib/openapi-responses';
+import { CursorQuerySchema } from '@/lib/pagination';
+import { requireAuth } from '@/middleware/require-auth';
+import { requireRole } from '@/middleware/require-role';
+import type { AppEnv } from '@/types/app';
 import {
 	ProgramOfferingsOffsetQuerySchema,
 	ProgramOfferingsOffsetResponseSchema,
-	ProgramOfferingsCursorQuerySchema,
 	ProgramOfferingsCursorResponseSchema,
 	ProgramOfferingParamsSchema,
 	ProgramOfferingResponseSchema,
 	CreateProgramOfferingSchema,
 	UpdateProgramOfferingSchema,
 } from './program_offerings.schema';
-import { requireAuth } from '@/middleware/require-auth';
-import { requireRole } from '@/middleware/require-role';
 import {
 	listProgramOfferings,
 	listProgramOfferingsCursor,
@@ -20,7 +26,7 @@ import {
 	createProgramOffering,
 	updateProgramOffering,
 	deleteProgramOffering,
-} from './program_offertings.handler';
+} from './program_offerings.handler';
 
 export const listProgramOfferingsRoute = createRoute({
 	method: 'get',
@@ -29,12 +35,7 @@ export const listProgramOfferingsRoute = createRoute({
 	summary: 'List program offerings (offset pagination)',
 	request: { query: ProgramOfferingsOffsetQuerySchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: ProgramOfferingsOffsetResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(ProgramOfferingsOffsetResponseSchema),
 	},
 });
 
@@ -43,14 +44,9 @@ export const listProgramOfferingsCursorRoute = createRoute({
 	path: '/cursor',
 	tags: ['Program Offerings'],
 	summary: 'List program offerings (cursor pagination)',
-	request: { query: ProgramOfferingsCursorQuerySchema },
+	request: { query: CursorQuerySchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: ProgramOfferingsCursorResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(ProgramOfferingsCursorResponseSchema),
 	},
 });
 
@@ -61,12 +57,7 @@ export const getProgramOfferingRoute = createRoute({
 	summary: 'Get program offering by ID',
 	request: { params: ProgramOfferingParamsSchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: ProgramOfferingResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(ProgramOfferingResponseSchema),
 		404: notFound,
 	},
 });
@@ -77,20 +68,10 @@ export const createProgramOfferingRoute = createRoute({
 	tags: ['Program Offerings'],
 	summary: 'Create a program offering (admin/personnel only)',
 	request: {
-		body: {
-			content: {
-				'application/json': { schema: CreateProgramOfferingSchema },
-			},
-			required: true,
-		},
+		body: jsonBody(CreateProgramOfferingSchema),
 	},
 	responses: {
-		201: {
-			content: {
-				'application/json': { schema: ProgramOfferingResponseSchema },
-			},
-			description: 'Created',
-		},
+		201: jsonCreated(ProgramOfferingResponseSchema),
 		401: unauthorized,
 		403: forbidden,
 	},
@@ -103,20 +84,10 @@ export const updateProgramOfferingRoute = createRoute({
 	summary: 'Update a program offering (admin/personnel only)',
 	request: {
 		params: ProgramOfferingParamsSchema,
-		body: {
-			content: {
-				'application/json': { schema: UpdateProgramOfferingSchema },
-			},
-			required: true,
-		},
+		body: jsonBody(UpdateProgramOfferingSchema),
 	},
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: ProgramOfferingResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(ProgramOfferingResponseSchema),
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,
@@ -130,7 +101,7 @@ export const deleteProgramOfferingRoute = createRoute({
 	summary: 'Delete a program offering (admin/personnel only)',
 	request: { params: ProgramOfferingParamsSchema },
 	responses: {
-		204: { description: 'Deleted' },
+		204: deletedNoContent,
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,

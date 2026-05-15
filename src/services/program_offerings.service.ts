@@ -1,6 +1,6 @@
 import { NewProgramOffering } from '@/db/schema';
 import { Errors } from '@/lib/errors';
-import { ProgramOfferingsRepo } from '@/repositories/program_offerings';
+import { ProgramOfferingsRepo } from '@/repositories/program_offerings.repo';
 
 export const createProgramOfferingsService = (
 	programOfferingsRepo: ProgramOfferingsRepo,

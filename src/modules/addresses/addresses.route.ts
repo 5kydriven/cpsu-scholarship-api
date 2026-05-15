@@ -1,10 +1,16 @@
-import { notFound, unauthorized, forbidden } from '@/lib/openapi-responses';
-import { AppEnv } from '@/types/app';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
+import {
+	deletedNoContent,
+	jsonBody,
+	jsonCreated,
+	jsonOk,
+} from '@/lib/openapi-helpers';
+import { forbidden, notFound, unauthorized } from '@/lib/openapi-responses';
+import { CursorQuerySchema } from '@/lib/pagination';
+import type { AppEnv } from '@/types/app';
 import {
 	AddressesOffsetQuerySchema,
 	AddressesOffsetResponseSchema,
-	AddressesCursorQuerySchema,
 	AddressesCursorResponseSchema,
 	AddressesParamsSchema,
 	AddressSelectSchema,
@@ -27,12 +33,7 @@ export const listAddressesRoute = createRoute({
 	summary: 'List addresses (offset pagination)',
 	request: { query: AddressesOffsetQuerySchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: AddressesOffsetResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(AddressesOffsetResponseSchema),
 	},
 });
 
@@ -41,14 +42,9 @@ export const listAddressesCursorRoute = createRoute({
 	path: '/cursor',
 	tags: ['Addresses'],
 	summary: 'List addresses (cursor pagination)',
-	request: { query: AddressesCursorQuerySchema },
+	request: { query: CursorQuerySchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: AddressesCursorResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(AddressesCursorResponseSchema),
 	},
 });
 
@@ -59,10 +55,7 @@ export const getAddressRoute = createRoute({
 	summary: 'Get address by ID',
 	request: { params: AddressesParamsSchema },
 	responses: {
-		200: {
-			content: { 'application/json': { schema: AddressSelectSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(AddressSelectSchema),
 		404: notFound,
 	},
 });
@@ -73,16 +66,10 @@ export const createAddressRoute = createRoute({
 	tags: ['Addresses'],
 	summary: 'Create a new address',
 	request: {
-		body: {
-			content: { 'application/json': { schema: AddressInsertSchema } },
-			required: true,
-		},
+		body: jsonBody(AddressInsertSchema),
 	},
 	responses: {
-		201: {
-			content: { 'application/json': { schema: AddressSelectSchema } },
-			description: 'Created',
-		},
+		201: jsonCreated(AddressSelectSchema),
 		401: unauthorized,
 		403: forbidden,
 	},
@@ -95,16 +82,10 @@ export const updateAddressRoute = createRoute({
 	summary: 'Update a address',
 	request: {
 		params: AddressesParamsSchema,
-		body: {
-			content: { 'application/json': { schema: AddressUpdateSchema } },
-			required: true,
-		},
+		body: jsonBody(AddressUpdateSchema),
 	},
 	responses: {
-		200: {
-			content: { 'application/json': { schema: AddressSelectSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(AddressSelectSchema),
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,
@@ -118,7 +99,7 @@ export const deleteAddressRoute = createRoute({
 	summary: 'Delete a address',
 	request: { params: AddressesParamsSchema },
 	responses: {
-		204: { description: 'Deleted' },
+		204: deletedNoContent,
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,

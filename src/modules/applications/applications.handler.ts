@@ -5,7 +5,7 @@ import { createApplicationsService } from '@/services/applications.service';
 import type { AppEnv } from '@/types/app';
 import type { createApplicationRoute } from './applications.route';
 import { createParentsRepo } from '@/repositories/parents.repo';
-import { createAddressesRepo } from '@/repositories/adresses.repo';
+import { createAddressesRepo } from '@/repositories/addresses.repo';
 
 const getApplicationsService = (c: Context<AppEnv>) =>
 	createApplicationsService(

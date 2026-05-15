@@ -1,19 +1,19 @@
 import { programOfferings } from '@/db/schema';
+import { OffsetQuerySchema } from '@/lib/pagination';
 import {
-	OffsetMetaSchema,
-	CursorMetaSchema,
-	OffsetQuerySchema,
-	CursorQuerySchema,
-} from '@/lib/pagination';
-import { createSchemaFactory } from 'drizzle-zod';
+	createCursorResponseSchema,
+	createOffsetResponseSchema,
+	generatedFields,
+	UuidIdParamsSchema,
+} from '@/lib/common-schemas';
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from '@/lib/drizzle-zod';
 import z from 'zod';
 
-const { createInsertSchema, createUpdateSchema, createSelectSchema } =
-	createSchemaFactory({ zodInstance: z });
-
-export const ProgramOfferingParamsSchema = z.object({
-	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
-});
+export const ProgramOfferingParamsSchema = UuidIdParamsSchema;
 
 export const ProgramOfferingResponseSchema = createSelectSchema(
 	programOfferings,
@@ -42,9 +42,7 @@ export const CreateProgramOfferingSchema = createInsertSchema(programOfferings, 
 	isActive: (schema) => schema.openapi({ example: true }),
 	isArchived: (schema) => schema.openapi({ example: false }),
 }).omit({
-	id: true,
-	createdAt: true,
-	updatedAt: true,
+	...generatedFields,
 });
 
 export const UpdateProgramOfferingSchema = createUpdateSchema(programOfferings, {
@@ -56,9 +54,7 @@ export const UpdateProgramOfferingSchema = createUpdateSchema(programOfferings, 
 	isArchived: (schema) => schema.openapi({ example: false }),
 })
 	.omit({
-		id: true,
-		createdAt: true,
-		updatedAt: true,
+		...generatedFields,
 	})
 	.refine(
 		(value) => Object.keys(value).length > 0,
@@ -67,15 +63,11 @@ export const UpdateProgramOfferingSchema = createUpdateSchema(programOfferings, 
 		},
 	);
 
-export const ProgramOfferingsOffsetResponseSchema = z.object({
-	data: ProgramOfferingResponseSchema.array(),
-	meta: OffsetMetaSchema,
-});
+export const ProgramOfferingsOffsetResponseSchema =
+	createOffsetResponseSchema(ProgramOfferingResponseSchema);
 
-export const ProgramOfferingsCursorResponseSchema = z.object({
-	data: ProgramOfferingResponseSchema.array(),
-	meta: CursorMetaSchema,
-});
+export const ProgramOfferingsCursorResponseSchema =
+	createCursorResponseSchema(ProgramOfferingResponseSchema);
 
 export const ProgramOfferingsOffsetQuerySchema = OffsetQuerySchema.extend({
 	search: z.string().optional().openapi({ example: 'TES' }),
@@ -85,5 +77,3 @@ export const ProgramOfferingsOffsetQuerySchema = OffsetQuerySchema.extend({
 		.openapi({ example: 'createdAt' }),
 	order: z.enum(['asc', 'desc']).default('desc').openapi({ example: 'desc' }),
 });
-
-export const ProgramOfferingsCursorQuerySchema = CursorQuerySchema;

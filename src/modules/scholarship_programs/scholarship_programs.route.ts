@@ -1,10 +1,18 @@
-import { notFound, unauthorized, forbidden } from '@/lib/openapi-responses';
-import { AppEnv } from '@/types/app';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
+import {
+	deletedNoContent,
+	jsonBody,
+	jsonCreated,
+	jsonOk,
+} from '@/lib/openapi-helpers';
+import { forbidden, notFound, unauthorized } from '@/lib/openapi-responses';
+import { CursorQuerySchema } from '@/lib/pagination';
+import { requireAuth } from '@/middleware/require-auth';
+import { requireRole } from '@/middleware/require-role';
+import type { AppEnv } from '@/types/app';
 import {
 	ScholarshipProgramsOffsetQuerySchema,
 	ScholarshipProgramsOffsetResponseSchema,
-	ScholarshipProgramsCursorQuerySchema,
 	ScholarshipProgramsCursorResponseSchema,
 	ScholarshipProgramParamsSchema,
 	ScholarshipProgramSelectSchema,
@@ -19,8 +27,6 @@ import {
 	updateScholarshipProgram,
 	deleteScholarshipProgram,
 } from './scholarship_programs.handler';
-import { requireAuth } from '@/middleware/require-auth';
-import { requireRole } from '@/middleware/require-role';
 
 export const listScholarshipProgramsRoute = createRoute({
 	method: 'get',
@@ -29,12 +35,7 @@ export const listScholarshipProgramsRoute = createRoute({
 	summary: 'List scholarship programs (offset pagination)',
 	request: { query: ScholarshipProgramsOffsetQuerySchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: ScholarshipProgramsOffsetResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(ScholarshipProgramsOffsetResponseSchema),
 	},
 });
 
@@ -43,14 +44,9 @@ export const listScholarshipProgramsCursorRoute = createRoute({
 	path: '/cursor',
 	tags: ['Scholarship Programs'],
 	summary: 'List scholarship programs (cursor pagination)',
-	request: { query: ScholarshipProgramsCursorQuerySchema },
+	request: { query: CursorQuerySchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: ScholarshipProgramsCursorResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(ScholarshipProgramsCursorResponseSchema),
 	},
 });
 
@@ -61,12 +57,7 @@ export const getScholarshipProgramRoute = createRoute({
 	summary: 'Get scholarship program by ID',
 	request: { params: ScholarshipProgramParamsSchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: ScholarshipProgramSelectSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(ScholarshipProgramSelectSchema),
 		404: notFound,
 	},
 });
@@ -77,20 +68,10 @@ export const createScholarshipProgramRoute = createRoute({
 	tags: ['Scholarship Programs'],
 	summary: 'Create a scholarship program (admin/personnel only)',
 	request: {
-		body: {
-			content: {
-				'application/json': { schema: ScholarshipProgramInsertSchema },
-			},
-			required: true,
-		},
+		body: jsonBody(ScholarshipProgramInsertSchema),
 	},
 	responses: {
-		201: {
-			content: {
-				'application/json': { schema: ScholarshipProgramSelectSchema },
-			},
-			description: 'Created',
-		},
+		201: jsonCreated(ScholarshipProgramSelectSchema),
 		401: unauthorized,
 		403: forbidden,
 	},
@@ -103,20 +84,10 @@ export const updateScholarshipProgramRoute = createRoute({
 	summary: 'Update a scholarship program (admin/personnel only)',
 	request: {
 		params: ScholarshipProgramParamsSchema,
-		body: {
-			content: {
-				'application/json': { schema: ScholarshipProgramUpdateSchema },
-			},
-			required: true,
-		},
+		body: jsonBody(ScholarshipProgramUpdateSchema),
 	},
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: ScholarshipProgramSelectSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(ScholarshipProgramSelectSchema),
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,
@@ -130,7 +101,7 @@ export const deleteScholarshipProgramRoute = createRoute({
 	summary: 'Delete a scholarship program (admin/personnel only)',
 	request: { params: ScholarshipProgramParamsSchema },
 	responses: {
-		204: { description: 'Deleted' },
+		204: deletedNoContent,
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,

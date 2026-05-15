@@ -1,5 +1,4 @@
 import z from 'zod';
-import { createSchemaFactory } from 'drizzle-zod';
 import { applications } from '@/db/schema';
 import { courseSelectSchema } from '../courses/courses.schema';
 import { parentInsertSchema, parentSelectSchema } from '../parents/parents.schema';
@@ -8,13 +7,13 @@ import {
 	AddressInsertSchema,
 	AddressSelectSchema,
 } from '../addresses/addresses.schema';
+import { generatedFields, UuidIdParamsSchema } from '@/lib/common-schemas';
+import {
+	createInsertSchema,
+	createSelectSchema,
+} from '@/lib/drizzle-zod';
 
-const { createInsertSchema, createUpdateSchema, createSelectSchema } =
-	createSchemaFactory({ zodInstance: z });
-
-export const ApplicationsParamsSchema = z.object({
-	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
-});
+export const ApplicationsParamsSchema = UuidIdParamsSchema;
 
 const applicationSchemaExamples = {
 	id: (schema: any) =>
@@ -87,9 +86,7 @@ export const applicationInsertSchema = createInsertSchema(
 	applicationSchemaExamples,
 )
 	.omit({
-		id: true,
-		createdAt: true,
-		updatedAt: true,
+		...generatedFields,
 	})
 	.extend({
 		addresses: nestedAddressInsertSchema.array().length(2).openapi({

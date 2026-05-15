@@ -1,19 +1,21 @@
 import { parents } from '@/db/schema';
 import {
-	CursorMetaSchema,
-	CursorQuerySchema,
-	OffsetMetaSchema,
 	OffsetQuerySchema,
 } from '@/lib/pagination';
-import { createSchemaFactory } from 'drizzle-zod';
+import {
+	createCursorResponseSchema,
+	createOffsetResponseSchema,
+	generatedFields,
+	UuidIdParamsSchema,
+} from '@/lib/common-schemas';
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from '@/lib/drizzle-zod';
 import z from 'zod';
 
-const { createInsertSchema, createUpdateSchema, createSelectSchema } =
-	createSchemaFactory({ zodInstance: z });
-
-export const ParentParamsSchema = z.object({
-	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
-});
+export const ParentParamsSchema = UuidIdParamsSchema;
 
 export const parentSchemaExamples = {
 	id: (schema: any) =>
@@ -40,29 +42,21 @@ export const parentInsertSchema = createInsertSchema(
 	parents,
 	parentSchemaExamples,
 ).omit({
-	updatedAt: true,
-	createdAt: true,
-	id: true,
+	...generatedFields,
 });
 
 export const parentUpdateSchema = createUpdateSchema(
 	parents,
 	parentSchemaExamples,
 ).omit({
-	updatedAt: true,
-	createdAt: true,
-	id: true,
+	...generatedFields,
 });
 
-export const ParentsOffsetResponseSchema = z.object({
-	data: parentSelectSchema.array(),
-	meta: OffsetMetaSchema,
-});
+export const ParentsOffsetResponseSchema =
+	createOffsetResponseSchema(parentSelectSchema);
 
-export const ParentsCursorResponseSchema = z.object({
-	data: parentSelectSchema.array(),
-	meta: CursorMetaSchema,
-});
+export const ParentsCursorResponseSchema =
+	createCursorResponseSchema(parentSelectSchema);
 
 export const ParentsOffsetQuerySchema = OffsetQuerySchema.extend({
 	search: z.string().optional().openapi({ example: 'John' }),
@@ -72,5 +66,3 @@ export const ParentsOffsetQuerySchema = OffsetQuerySchema.extend({
 		.openapi({ example: 'createdAt' }),
 	order: z.enum(['asc', 'desc']).default('desc').openapi({ example: 'desc' }),
 });
-
-export const ParentsCursorQuerySchema = CursorQuerySchema;

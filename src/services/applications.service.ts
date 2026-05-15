@@ -1,31 +1,12 @@
-import type { NewApplication, NewParent } from '@/db/schema';
+import type { NewAddress, NewApplication, NewParent } from '@/db/schema';
 import { Errors } from '@/lib/errors';
 import type { ApplicationsRepo } from '@/repositories/applications';
 import type { ParentsRepo } from '@/repositories/parents.repo';
-import type { AddressesRepo } from '@/repositories/adresses.repo';
+import type { AddressesRepo } from '@/repositories/addresses.repo';
 
-const applicationFileFields = [
-	{ fileField: 'pwdFile', urlField: 'pwdUrl', prefix: 'pwd' },
-	{ fileField: 'ipFile', urlField: 'ipUrl', prefix: 'ip' },
-	{ fileField: 'fourPsFile', urlField: 'fourPsUrl', prefix: 'fourps' },
-] as const;
 
-type ApplicationFileField = (typeof applicationFileFields)[number]['fileField'];
 
-const getFileExtension = (fileName: string) => {
-	const extensionStart = fileName.lastIndexOf('.');
-	return extensionStart === -1
-		? ''
-		: fileName.slice(extensionStart).toLowerCase();
-};
 
-const validateFileSize = (field: ApplicationFileField, file: File) => {
-	if (file.size > 5 * 1024 * 1024) {
-		throw Errors.validation([
-			{ field, message: 'File must be 5 MB or smaller' },
-		]);
-	}
-};
 
 export const createApplicationsService = (
 	applicationsRepo: ApplicationsRepo,
@@ -46,16 +27,9 @@ export const createApplicationsService = (
 	async create(
 		application: NewApplication,
 		parents: Omit<NewParent, 'applicationId'>[],
-		pwdFile?: File | null,
-		ipFile?: File | null,
-		fourPsFile?: File | null,
+		addresses: Omit<NewAddress, 'applicationId'>[],
 	) {
-		const files: Record<ApplicationFileField, File | null | undefined> = {
-			pwdFile,
-			ipFile,
-			fourPsFile,
-		};
-		const uploadedKeys: string[] = [];
+
 		const applicationPayload = { ...application };
 
 		try {

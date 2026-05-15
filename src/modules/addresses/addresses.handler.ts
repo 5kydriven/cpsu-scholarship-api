@@ -1,5 +1,5 @@
-import { createOffsetMeta, createCursorMeta } from '@/lib/pagination';
-import { createAddressesRepo } from '@/repositories/adresses.repo';
+import { createCursorPage, createOffsetPage } from '@/lib/pagination';
+import { createAddressesRepo } from '@/repositories/addresses.repo';
 import { createAddressesService } from '@/services/addresses.service';
 import { AppEnv } from '@/types/app';
 import { RouteHandler } from '@hono/zod-openapi';
@@ -31,10 +31,7 @@ export const listAddresses: RouteHandler<
 	});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createOffsetMeta({ total, page, perPage }),
-		},
+		createOffsetPage({ rows, total, page, perPage }),
 		200,
 	);
 };
@@ -53,16 +50,13 @@ export const listAddressesCursor: RouteHandler<
 		});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createCursorMeta({
-				nextCursor,
-				prevCursor,
-				hasNext,
-				hasPrev,
-				perPage,
-			}),
-		},
+		createCursorPage(rows, {
+			nextCursor,
+			prevCursor,
+			hasNext,
+			hasPrev,
+			perPage,
+		}),
 		200,
 	);
 };

@@ -12,7 +12,7 @@ import type {
 	listStaffProfilesRoute,
 	updateStaffProfileRoute,
 } from './staff_profiles.route';
-import { createCursorMeta, createOffsetMeta } from '@/lib/pagination';
+import { createCursorPage, createOffsetPage } from '@/lib/pagination';
 
 const getStaffProfilesService = (c: Context<AppEnv>) =>
 	createStaffProfilesService(createStaffProfilesRepo(c.get('db')));
@@ -67,10 +67,7 @@ export const listStaffProfiles: RouteHandler<
 	});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createOffsetMeta({ total, page, perPage }),
-		},
+		createOffsetPage({ rows, total, page, perPage }),
 		200,
 	);
 };
@@ -124,16 +121,13 @@ export const listStaffProfilesCursor: RouteHandler<
 		});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createCursorMeta({
-				nextCursor,
-				prevCursor,
-				hasNext,
-				hasPrev,
-				perPage,
-			}),
-		},
+		createCursorPage(rows, {
+			nextCursor,
+			prevCursor,
+			hasNext,
+			hasPrev,
+			perPage,
+		}),
 		200,
 	);
 };
