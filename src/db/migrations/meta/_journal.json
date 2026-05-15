@@ -148,6 +148,13 @@
       "when": 1778855531386,
       "tag": "0020_furry_red_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1778857202123,
+      "tag": "0021_lethal_ronan",
+      "breakpoints": true
     }
   ]
 }

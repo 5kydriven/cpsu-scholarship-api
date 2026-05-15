@@ -5,11 +5,21 @@ import {
 	jsonCreated,
 	jsonOk,
 } from '@/lib/openapi-helpers';
-import { forbidden, notFound, unauthorized } from '@/lib/openapi-responses';
+import {
+	conflict,
+	forbidden,
+	notFound,
+	unauthorized,
+} from '@/lib/openapi-responses';
 import { CursorQuerySchema } from '@/lib/pagination';
 import { requireAuth } from '@/middleware/require-auth';
 import { requireRole } from '@/middleware/require-role';
 import type { AppEnv } from '@/types/app';
+import {
+	EligibilitySuggestionRunDetailResponseSchema,
+	EligibilitySuggestionRunParamsSchema,
+	EligibilitySuggestionRunsResponseSchema,
+} from './eligibility_suggestions.schema';
 import {
 	ProgramOfferingsOffsetQuerySchema,
 	ProgramOfferingsOffsetResponseSchema,
@@ -26,6 +36,9 @@ import {
 	createProgramOffering,
 	updateProgramOffering,
 	deleteProgramOffering,
+	generateEligibilitySuggestions,
+	getEligibilitySuggestionRun,
+	listEligibilitySuggestionRuns,
 } from './program_offerings.handler';
 
 export const listProgramOfferingsRoute = createRoute({
@@ -108,6 +121,51 @@ export const deleteProgramOfferingRoute = createRoute({
 	},
 });
 
+export const generateEligibilitySuggestionsRoute = createRoute({
+	method: 'post',
+	path: '/{id}/eligibility-suggestions/generate',
+	tags: ['Program Offerings'],
+	summary:
+		'Generate eligibility suggestions for an inactive offering (admin/personnel only)',
+	request: { params: ProgramOfferingParamsSchema },
+	responses: {
+		200: jsonOk(EligibilitySuggestionRunDetailResponseSchema),
+		401: unauthorized,
+		403: forbidden,
+		404: notFound,
+		409: conflict,
+	},
+});
+
+export const listEligibilitySuggestionRunsRoute = createRoute({
+	method: 'get',
+	path: '/{id}/eligibility-suggestions/runs',
+	tags: ['Program Offerings'],
+	summary: 'List eligibility suggestion runs for an offering (admin/personnel only)',
+	request: { params: ProgramOfferingParamsSchema },
+	responses: {
+		200: jsonOk(EligibilitySuggestionRunsResponseSchema),
+		401: unauthorized,
+		403: forbidden,
+		404: notFound,
+	},
+});
+
+export const getEligibilitySuggestionRunRoute = createRoute({
+	method: 'get',
+	path: '/{id}/eligibility-suggestions/runs/{runId}',
+	tags: ['Program Offerings'],
+	summary:
+		'Get an eligibility suggestion run with ranked suggestions (admin/personnel only)',
+	request: { params: EligibilitySuggestionRunParamsSchema },
+	responses: {
+		200: jsonOk(EligibilitySuggestionRunDetailResponseSchema),
+		401: unauthorized,
+		403: forbidden,
+		404: notFound,
+	},
+});
+
 export const programOfferingsRoute = new OpenAPIHono<AppEnv>();
 
 programOfferingsRoute.openapi(listProgramOfferingsRoute, listProgramOfferings);
@@ -118,6 +176,18 @@ programOfferingsRoute.openapi(
 programOfferingsRoute.openapi(getProgramOfferingRoute, getProgramOffering);
 
 programOfferingsRoute.use('/*', requireAuth, requireRole('personnel'));
+programOfferingsRoute.openapi(
+	generateEligibilitySuggestionsRoute,
+	generateEligibilitySuggestions,
+);
+programOfferingsRoute.openapi(
+	listEligibilitySuggestionRunsRoute,
+	listEligibilitySuggestionRuns,
+);
+programOfferingsRoute.openapi(
+	getEligibilitySuggestionRunRoute,
+	getEligibilitySuggestionRun,
+);
 programOfferingsRoute.openapi(
 	createProgramOfferingRoute,
 	createProgramOffering,

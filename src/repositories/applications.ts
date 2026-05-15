@@ -28,6 +28,15 @@ export const createApplicationsRepo = (db: Db) => ({
 					with: applicationWithRelations,
 				}),
 
+	findPendingByOfferingId: (offeringId: string) =>
+		db.query.applications.findMany({
+			where: and(
+				eq(applications.offeringId, offeringId),
+				eq(applications.status, 'pending'),
+			),
+			with: applicationWithRelations,
+		}),
+
 	create: (data: NewApplication) =>
 		db
 			.insert(applications)
@@ -52,6 +61,23 @@ export const createApplicationsRepo = (db: Db) => ({
 				status: 'approved',
 				reviewedBy,
 				reviewedAt,
+				updatedAt: reviewedAt,
+			})
+			.where(inArray(applications.id, ids));
+
+		return db.query.applications.findMany({
+			where: inArray(applications.id, ids),
+			with: applicationWithRelations,
+		});
+	},
+
+	markManyUnderReview: async (ids: string[], reviewedAt: string) => {
+		if (ids.length === 0) return [];
+
+		await db
+			.update(applications)
+			.set({
+				status: 'under_review',
 				updatedAt: reviewedAt,
 			})
 			.where(inArray(applications.id, ids));
