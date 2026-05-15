@@ -61,11 +61,11 @@ export const applicationSelectSchema = createSelectSchema(
 	applicationSchemaExamples,
 );
 
-const nestedAddressInsertSchema = AddressInsertSchema.omit({
+const applicationAddressInputSchema = AddressInsertSchema.omit({
 	applicationId: true,
 });
 
-const nestedParentInsertSchema = parentInsertSchema.omit({
+const applicationParentInputSchema = parentInsertSchema.omit({
 	applicationId: true,
 });
 
@@ -89,10 +89,10 @@ export const applicationInsertSchema = createInsertSchema(
 		...generatedFields,
 	})
 	.extend({
-		addresses: nestedAddressInsertSchema.array().length(2).openapi({
+		addresses: applicationAddressInputSchema.array().length(2).openapi({
 			description: 'Exactly two address records for the application',
 		}),
-		parents: nestedParentInsertSchema.array().length(2).openapi({
+		parents: applicationParentInputSchema.array().length(2).openapi({
 			description: 'Exactly two parent or guardian records for the application',
 		}),
 	});

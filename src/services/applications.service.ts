@@ -4,9 +4,19 @@ import type { ApplicationsRepo } from '@/repositories/applications';
 import type { ParentsRepo } from '@/repositories/parents.repo';
 import type { AddressesRepo } from '@/repositories/addresses.repo';
 
+const isUniqueConstraintError = (error: unknown) =>
+	typeof error === 'object' &&
+	error !== null &&
+	'code' in error &&
+	error.code === '23505';
 
+const toCreateApplicationError = (error: unknown) => {
+	if (isUniqueConstraintError(error)) {
+		return Errors.conflict('Application already exists for this offering');
+	}
 
-
+	return error;
+};
 
 export const createApplicationsService = (
 	applicationsRepo: ApplicationsRepo,
@@ -29,20 +39,34 @@ export const createApplicationsService = (
 		parents: Omit<NewParent, 'applicationId'>[],
 		addresses: Omit<NewAddress, 'applicationId'>[],
 	) {
-
 		const applicationPayload = { ...application };
+		const app = await applicationsRepo.create(applicationPayload).catch((error) => {
+			throw toCreateApplicationError(error);
+		});
 
 		try {
-			const app = await applicationsRepo.create(applicationPayload);
 			const parentPayloads = parents.map((p) => ({
 				...p,
 				applicationId: app.id,
 			}));
-			const createdParents = await parentsRepo.createMany(parentPayloads);
+			const addressPayloads = addresses.map((address) => ({
+				...address,
+				applicationId: app.id,
+			}));
 
-			return { application: app, parents: createdParents };
+			await parentsRepo.createMany(parentPayloads);
+			await addressesRepo.createMany(addressPayloads);
+
+			const createdApplication = await applicationsRepo.findById(app.id);
+			if (!createdApplication) {
+				throw Errors.internal('Created application could not be loaded');
+			}
+
+			const { offeringId, courseId, student, ...response } = createdApplication;
+			return response;
 		} catch (error) {
-			throw error;
+			await applicationsRepo.delete(app.id);
+			throw toCreateApplicationError(error);
 		}
 	},
 

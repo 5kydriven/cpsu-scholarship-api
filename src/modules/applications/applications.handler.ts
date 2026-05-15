@@ -18,9 +18,13 @@ export const createApplication: RouteHandler<
 	typeof createApplicationRoute,
 	AppEnv
 > = async (c) => {
-	const body = await c.req.parseBody();
+	const { parents, addresses, ...application } = c.req.valid('json');
 	const service = getApplicationsService(c);
-	// const result = await service.create();
+	const result = await service.create(
+		application,
+		parents,
+		addresses,
+	);
 
-	return c.json(body, 201);
+	return c.json(result, 201);
 };
