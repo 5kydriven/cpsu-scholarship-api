@@ -141,6 +141,13 @@
       "when": 1778852424883,
       "tag": "0019_flippant_kate_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1778855531386,
+      "tag": "0020_furry_red_hulk",
+      "breakpoints": true
     }
   ]
 }

@@ -55,6 +55,12 @@ export const StudentProfileSchema = createSelectSchema(student, {
 	userId: (schema) => schema.openapi({ example: 'user_123' }),
 	studentNumber: (schema) => schema.openapi({ example: '2025-0015-R' }),
 	name: (schema) => schema.openapi({ example: 'ABELO, JANEL' }),
+	firstName: (schema) => schema.openapi({ example: 'Janel' }),
+	lastName: (schema) => schema.openapi({ example: 'Abelo' }),
+	middleName: (schema) => schema.openapi({ example: 'Reyes' }),
+	extName: (schema) => schema.openapi({ example: 'Jr.' }),
+	courseId: (schema) =>
+		schema.openapi({ example: 'd4e5f6a7-b8c9-0123-defa-456789012345' }),
 	email: (schema) => schema.openapi({ example: 'student@example.com' }),
 	createdAt: (schema) =>
 		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),

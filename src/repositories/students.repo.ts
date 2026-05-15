@@ -2,6 +2,11 @@ import type { Db } from '@/db';
 import { student, user, type NewStudent } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
+type StudentProfileUpdate = Pick<
+	NewStudent,
+	'name' | 'firstName' | 'lastName' | 'middleName' | 'extName' | 'courseId'
+>;
+
 export const createStudentsRepo = (db: Db) => ({
 	findByStudentNumber: (studentNumber: string) =>
 		db
@@ -25,6 +30,14 @@ export const createStudentsRepo = (db: Db) => ({
 			.values(data)
 			.returning()
 			.then((r) => r[0]),
+
+	updateSubmittedProfile: (id: string, data: StudentProfileUpdate) =>
+		db
+			.update(student)
+			.set({ ...data, updatedAt: new Date().toISOString() })
+			.where(eq(student.id, id))
+			.returning()
+			.then((r) => r[0] ?? null),
 
 	delete: (id: string) =>
 		db.delete(student).where(eq(student.id, id)).returning(),

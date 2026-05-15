@@ -3,6 +3,7 @@ import { Errors } from '@/lib/errors';
 import type { ApplicationsRepo } from '@/repositories/applications';
 import type { ParentsRepo } from '@/repositories/parents.repo';
 import type { AddressesRepo } from '@/repositories/addresses.repo';
+import type { StudentsRepo } from '@/repositories/students.repo';
 import {
 	finalApplicationStatuses,
 	orderApplicationsByIds,
@@ -14,6 +15,7 @@ export const createApplicationsService = (
 	applicationsRepo: ApplicationsRepo,
 	parentsRepo: ParentsRepo,
 	addressesRepo: AddressesRepo,
+	studentsRepo: StudentsRepo,
 ) => ({
 	async getById(id: string) {
 		const application = await applicationsRepo.findById(id);
@@ -48,6 +50,21 @@ export const createApplicationsService = (
 
 			await parentsRepo.createMany(parentPayloads);
 			await addressesRepo.createMany(addressPayloads);
+			const updatedStudent = await studentsRepo.updateSubmittedProfile(
+				app.studentId,
+				{
+					name: buildFullName(application),
+					firstName: application.firstName,
+					lastName: application.lastName,
+					middleName: application.middleName ?? null,
+					extName: application.extName ?? null,
+					courseId: application.courseId ?? null,
+				},
+			);
+
+			if (!updatedStudent) {
+				throw Errors.notFound('Student not found');
+			}
 
 			const createdApplication = await applicationsRepo.findById(app.id);
 			if (!createdApplication) {
@@ -154,5 +171,21 @@ export const createApplicationsService = (
 		return { rows: rows.map(toApplicationResponse), ...meta };
 	},
 });
+
+const buildFullName = (
+	application: Pick<
+		NewApplication,
+		'firstName' | 'lastName' | 'middleName' | 'extName'
+	>,
+) =>
+	[
+		application.firstName,
+		application.middleName,
+		application.lastName,
+		application.extName,
+	]
+		.map((part) => part?.trim())
+		.filter((part): part is string => !!part)
+		.join(' ');
 
 export type ApplicationsService = ReturnType<typeof createApplicationsService>;

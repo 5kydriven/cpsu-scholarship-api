@@ -4,6 +4,7 @@ import { createCursorPage, createOffsetPage } from '@/lib/pagination';
 import { createApplicationsRepo } from '@/repositories/applications';
 import { createAddressesRepo } from '@/repositories/addresses.repo';
 import { createParentsRepo } from '@/repositories/parents.repo';
+import { createStudentsRepo } from '@/repositories/students.repo';
 import { createApplicationsService } from '@/services/applications.service';
 import type { AppEnv } from '@/types/app';
 import type {
@@ -21,6 +22,7 @@ const getApplicationsService = (c: Context<AppEnv>) =>
 		createApplicationsRepo(c.get('db')),
 		createParentsRepo(c.get('db')),
 		createAddressesRepo(c.get('db')),
+		createStudentsRepo(c.get('db')),
 	);
 
 export const createApplication: RouteHandler<
