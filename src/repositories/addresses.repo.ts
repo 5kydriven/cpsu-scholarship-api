@@ -1,5 +1,5 @@
 import { Db } from '@/db';
-import { addresses, courses, NewAddress } from '@/db/schema';
+import { addresses, NewAddress } from '@/db/schema';
 import { decodeCursor, encodeCursor } from '@/lib/pagination';
 import { SortOrder } from '@/types/common';
 import { and, asc, count, desc, eq, gt, ilike, lt, or } from 'drizzle-orm';
@@ -19,6 +19,9 @@ export const createAddressesRepo = (db: Db) => ({
 			.values(data)
 			.returning()
 			.then((r) => r[0]),
+
+	createMany: (data: NewAddress[]) =>
+		db.insert(addresses).values(data).returning(),
 
 	update: (id: string, data: Partial<NewAddress>) =>
 		db

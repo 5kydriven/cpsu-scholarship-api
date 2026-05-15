@@ -120,6 +120,41 @@
       "when": 1778521150766,
       "tag": "0016_goofy_winter_soldier",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1778769424524,
+      "tag": "0017_pale_venus",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1778851024421,
+      "tag": "0018_even_krista_starr",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1778852424883,
+      "tag": "0019_flippant_kate_bishop",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1778855531386,
+      "tag": "0020_furry_red_hulk",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1778857202123,
+      "tag": "0021_lethal_ronan",
+      "breakpoints": true
     }
   ]
 }

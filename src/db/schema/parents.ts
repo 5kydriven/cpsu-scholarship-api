@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import {
 	index,
 	pgEnum,
@@ -46,6 +47,13 @@ export const parents = pgTable(
 	},
 	(table) => [index('idx_parents_application_id').on(table.applicationId)],
 );
+
+export const parentsRelations = relations(parents, ({ one }) => ({
+	application: one(applications, {
+		fields: [parents.applicationId],
+		references: [applications.id],
+	}),
+}));
 
 export type Parent = typeof parents.$inferSelect;
 export type NewParent = typeof parents.$inferInsert;

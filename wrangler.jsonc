@@ -1,5 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
+	"account_id": "7212c9c8e8d69108e0538c6a7977115d",
 	"name": "cpsu-scholarship-api",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-05-04",
@@ -8,30 +9,43 @@
 	"dev": {
 		"port": 3000,
 	},
-	// "kv_namespaces": [
-	//   {
-	//     "binding": "MY_KV_NAMESPACE",
-	//     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-	//   }
-	// ],
-	// "r2_buckets": [
-	//   {
-	//     "binding": "MY_BUCKET",
-	//     "bucket_name": "my-bucket"
-	//   }
-	// ],
-	// "d1_databases": [
-	//   {
-	//     "binding": "MY_DB",
-	//     "database_name": "my-database",
-	//     "database_id": ""
-	//   }
-	// ],
-	// "ai": {
-	//   "binding": "AI"
-	// },
 	"observability": {
 		"enabled": true,
-		// "head_sampling_rate": 1,
+	},
+	"r2_buckets": [
+		{
+			"binding": "R2",
+			"bucket_name": "cpsu-application-docs-local",
+		},
+	],
+	"env": {
+		"staging": {
+			"name": "cpsu-scholarship-api-staging",
+			"vars": {
+				"APP_ENV": "staging",
+				"BETTER_AUTH_URL": "https://cpsu-scholarship-api-staging.tagpuno619.workers.dev",
+				"PUBLIC_URL": "https://pub-ae01ff6cf3d140e08992f30178f9b70a.r2.dev",
+			},
+			"r2_buckets": [
+				{
+					"binding": "R2",
+					"bucket_name": "cpsu-application-docs-staging",
+				},
+			],
+		},
+		"production": {
+			"name": "cpsu-scholarship-api",
+			"vars": {
+				"APP_ENV": "production",
+				"BETTER_AUTH_URL": "https://cpsu-scholarship-api.tagpuno619.workers.dev",
+				"PUBLIC_URL": "https://pub-ae01ff6cf3d140e08992f30178f9b70a.r2.dev",
+			},
+			"r2_buckets": [
+				{
+					"binding": "R2",
+					"bucket_name": "cpsu-application-docs-staging",
+				},
+			],
+		},
 	},
 }

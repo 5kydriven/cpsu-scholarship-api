@@ -1,16 +1,23 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 import {
-	CreateParentSchema,
+	deletedNoContent,
+	jsonBody,
+	jsonCreated,
+	jsonOk,
+} from '@/lib/openapi-helpers';
+import { unauthorized, forbidden, notFound } from '@/lib/openapi-responses';
+import { CursorQuerySchema } from '@/lib/pagination';
+import { requireAuth } from '@/middleware/require-auth';
+import type { AppEnv } from '@/types/app';
+import {
+	parentInsertSchema,
 	ParentParamsSchema,
-	ParentResponseSchema,
-	ParentsCursorQuerySchema,
 	ParentsCursorResponseSchema,
+	parentSelectSchema,
 	ParentsOffsetQuerySchema,
 	ParentsOffsetResponseSchema,
-	UpdateParentSchema,
+	parentUpdateSchema,
 } from './parents.schema';
-import { unauthorized, forbidden, notFound } from '@/lib/openapi-responses';
-import { AppEnv } from '@/types/app';
 import {
 	createParent,
 	deleteParent,
@@ -19,8 +26,6 @@ import {
 	listParentsCursor,
 	updateParent,
 } from './parents.handler';
-import { requireAuth } from '@/middleware/require-auth';
-import { requireRole } from '@/middleware/require-role';
 
 export const listParentsRoute = createRoute({
 	method: 'get',
@@ -29,10 +34,7 @@ export const listParentsRoute = createRoute({
 	summary: 'List parents (offset pagination)',
 	request: { query: ParentsOffsetQuerySchema },
 	responses: {
-		200: {
-			content: { 'application/json': { schema: ParentsOffsetResponseSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(ParentsOffsetResponseSchema),
 	},
 });
 
@@ -41,12 +43,9 @@ export const listParentsCursorRoute = createRoute({
 	path: '/cursor',
 	tags: ['Parents'],
 	summary: 'List parents (cursor pagination)',
-	request: { query: ParentsCursorQuerySchema },
+	request: { query: CursorQuerySchema },
 	responses: {
-		200: {
-			content: { 'application/json': { schema: ParentsCursorResponseSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(ParentsCursorResponseSchema),
 	},
 });
 
@@ -57,10 +56,7 @@ export const getParentRoute = createRoute({
 	summary: 'Get parent by id',
 	request: { params: ParentParamsSchema },
 	responses: {
-		200: {
-			content: { 'application/json': { schema: ParentResponseSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(parentSelectSchema),
 	},
 });
 
@@ -70,16 +66,10 @@ export const createParentRoute = createRoute({
 	tags: ['Parents'],
 	summary: 'Create a new parent',
 	request: {
-		body: {
-			content: { 'application/json': { schema: CreateParentSchema } },
-			required: true,
-		},
+		body: jsonBody(parentInsertSchema),
 	},
 	responses: {
-		201: {
-			content: { 'application/json': { schema: ParentResponseSchema } },
-			description: 'Created',
-		},
+		201: jsonCreated(parentSelectSchema),
 		401: unauthorized,
 		403: forbidden,
 	},
@@ -92,16 +82,10 @@ export const updateParentRoute = createRoute({
 	summary: 'Update a parent',
 	request: {
 		params: ParentParamsSchema,
-		body: {
-			content: { 'application/json': { schema: UpdateParentSchema } },
-			required: true,
-		},
+		body: jsonBody(parentUpdateSchema),
 	},
 	responses: {
-		200: {
-			content: { 'application/json': { schema: ParentResponseSchema } },
-			description: 'OK',
-		},
+		200: jsonOk(parentSelectSchema),
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,
@@ -115,7 +99,7 @@ export const deleteParentRoute = createRoute({
 	summary: 'Delete a parent',
 	request: { params: ParentParamsSchema },
 	responses: {
-		204: { description: 'Deleted' },
+		204: deletedNoContent,
 		401: unauthorized,
 		403: forbidden,
 		404: notFound,

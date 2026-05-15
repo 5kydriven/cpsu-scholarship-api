@@ -14,7 +14,7 @@ export const createStaffProfilesService = (
 		lastName: string;
 		department: string;
 		position: string;
-		contactNumber?: string;
+		contactNumber?: string | null;
 	}) {
 		try {
 			const user = await staffProfilesRepo.updateUserRole(
@@ -56,6 +56,10 @@ export const createStaffProfilesService = (
 		const personnel = await staffProfilesRepo.findById(id);
 		if (!personnel) throw Errors.notFound('Personnel not found');
 		return personnel;
+	},
+
+	async findByUserId(userId: string) {
+		return staffProfilesRepo.findByUserId(userId);
 	},
 
 	async update(id: string, data: UpdateStaffProfileInput) {

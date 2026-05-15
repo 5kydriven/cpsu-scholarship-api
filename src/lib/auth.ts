@@ -2,6 +2,7 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import type { Db } from '../db';
 import { account, session, user, verification } from '../db/schema/auth';
+import { hashPassword, verifyPassword } from '../utils/crypto';
 
 export const createAuth = (db: Db, env: CloudflareBindings) => {
 	return betterAuth({
@@ -22,6 +23,10 @@ export const createAuth = (db: Db, env: CloudflareBindings) => {
 			enabled: true,
 			requireEmailVerification: false,
 			autoSignIn: false,
+			password: {
+				hash: hashPassword,
+				verify: async ({ hash, password }) => verifyPassword(hash, password),
+			},
 		},
 
 		user: {

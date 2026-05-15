@@ -1,50 +1,60 @@
+import { scholarshipPrograms } from '@/db/schema';
 import {
-	OffsetMetaSchema,
-	CursorMetaSchema,
 	OffsetQuerySchema,
-	CursorQuerySchema,
 } from '@/lib/pagination';
+import {
+	createCursorResponseSchema,
+	createOffsetResponseSchema,
+	generatedFields,
+	UuidIdParamsSchema,
+} from '@/lib/common-schemas';
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from '@/lib/drizzle-zod';
 import z from 'zod';
 
-export const ScholarshipProgramParamsSchema = z.object({
-	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+export const ScholarshipProgramParamsSchema = UuidIdParamsSchema;
+
+const scholarshipProgramSchemaExamples = {
+	id: (schema: any) =>
+		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+	name: (schema: any) =>
+		schema.openapi({ example: 'Tertiary Education Subsidy' }),
+	description: (schema: any) =>
+		schema.openapi({ example: 'Financial assistance for eligible students' }),
+	isArchived: (schema: any) => schema.openapi({ example: false }),
+	createdAt: (schema: any) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	updatedAt: (schema: any) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+};
+
+export const ScholarshipProgramSelectSchema = createSelectSchema(
+	scholarshipPrograms,
+	scholarshipProgramSchemaExamples,
+);
+
+export const ScholarshipProgramInsertSchema = createInsertSchema(
+	scholarshipPrograms,
+	scholarshipProgramSchemaExamples,
+).omit({
+	...generatedFields,
 });
 
-export const CreateScholarshipProgramSchema = z.object({
-	name: z.string().min(2).max(100).openapi({ example: 'TES' }),
-	description: z
-		.string()
-		.optional()
-		.openapi({ example: 'Scolarship Program....' }),
-	isArchived: z.boolean().optional().default(false).openapi({ example: false }),
+export const ScholarshipProgramUpdateSchema = createUpdateSchema(
+	scholarshipPrograms,
+	scholarshipProgramSchemaExamples,
+).omit({
+	...generatedFields,
 });
 
-export const UpdateScholarshipProgramSchema =
-	CreateScholarshipProgramSchema.partial().refine(
-		(v) => Object.keys(v).length > 0,
-		{
-			message: 'At least one scholarship program field is required',
-		},
-	);
+export const ScholarshipProgramsOffsetResponseSchema =
+	createOffsetResponseSchema(ScholarshipProgramSelectSchema);
 
-export const ScholarshipProgramResponseSchema = z.object({
-	id: z.uuid(),
-	name: z.string(),
-	description: z.string().nullable(),
-	isArchived: z.boolean(),
-	createdAt: z.string(),
-	updatedAt: z.string(),
-});
-
-export const ScholarshipProgramsOffsetResponseSchema = z.object({
-	data: ScholarshipProgramResponseSchema.array(),
-	meta: OffsetMetaSchema,
-});
-
-export const ScholarshipProgramsCursorResponseSchema = z.object({
-	data: ScholarshipProgramResponseSchema.array(),
-	meta: CursorMetaSchema,
-});
+export const ScholarshipProgramsCursorResponseSchema =
+	createCursorResponseSchema(ScholarshipProgramSelectSchema);
 
 export const ScholarshipProgramsOffsetQuerySchema = OffsetQuerySchema.extend({
 	search: z.string().optional().openapi({ example: 'TES' }),
@@ -54,12 +64,3 @@ export const ScholarshipProgramsOffsetQuerySchema = OffsetQuerySchema.extend({
 		.openapi({ example: 'createdAt' }),
 	order: z.enum(['asc', 'desc']).default('desc').openapi({ example: 'desc' }),
 });
-
-export const ScholarshipProgramsCursorQuerySchema = CursorQuerySchema;
-
-export type UpdateScholarshipProgramInput = z.infer<
-	typeof UpdateScholarshipProgramSchema
->;
-export type CreateScholarshipProgramInput = z.infer<
-	typeof CreateScholarshipProgramSchema
->;

@@ -3,7 +3,7 @@ import { createStudentAllowlistsRepo } from '@/repositories/student_allowlists.r
 import { createStudentAllowlistService } from '@/services/student_allowlist.service';
 import type { AppEnv } from '@/types/app';
 import type { Context } from 'hono';
-import { createCursorMeta, createOffsetMeta } from '@/lib/pagination';
+import { createCursorPage, createOffsetPage } from '@/lib/pagination';
 import { Errors } from '@/lib/errors';
 import { normalizeStudentNumber } from '@/lib/student-number';
 import * as XLSX from 'xlsx';
@@ -206,10 +206,7 @@ export const listStudentAllowlists: RouteHandler<
 	});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createOffsetMeta({ total, page, perPage }),
-		},
+		createOffsetPage({ rows, total, page, perPage }),
 		200,
 	);
 };
@@ -228,16 +225,13 @@ export const listStudentAllowlistsCursor: RouteHandler<
 		});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createCursorMeta({
-				nextCursor,
-				prevCursor,
-				hasNext,
-				hasPrev,
-				perPage,
-			}),
-		},
+		createCursorPage(rows, {
+			nextCursor,
+			prevCursor,
+			hasNext,
+			hasPrev,
+			perPage,
+		}),
 		200,
 	);
 };

@@ -1,6 +1,6 @@
 import { NewAddress } from '@/db/schema';
 import { Errors } from '@/lib/errors';
-import { AddressesRepo } from '@/repositories/adresses.repo';
+import { AddressesRepo } from '@/repositories/addresses.repo';
 
 export const createAddressesService = (addressesRepo: AddressesRepo) => ({
 	async getById(id: string) {

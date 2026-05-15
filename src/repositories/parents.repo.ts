@@ -19,6 +19,9 @@ export const createParentsRepo = (db: Db) => ({
 			.returning()
 			.then((r) => r[0]),
 
+	createMany: (data: NewParent[]) =>
+		db.insert(parents).values(data).returning(),
+
 	update: (id: string, data: Partial<NewParent>) =>
 		db
 			.update(parents)

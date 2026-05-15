@@ -1,4 +1,4 @@
-import { createCursorMeta, createOffsetMeta } from '@/lib/pagination';
+import { createCursorPage, createOffsetPage } from '@/lib/pagination';
 import { createParentsRepo } from '@/repositories/parents.repo';
 import { createParentsService } from '@/services/parents.service';
 import { AppEnv } from '@/types/app';
@@ -30,10 +30,7 @@ export const listParents: RouteHandler<
 		sortOrder: order,
 	});
 	return c.json(
-		{
-			data: rows,
-			meta: createOffsetMeta({ total, perPage, page }),
-		},
+		createOffsetPage({ rows, total, perPage, page }),
 		200,
 	);
 };
@@ -52,16 +49,13 @@ export const listParentsCursor: RouteHandler<
 		});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createCursorMeta({
-				nextCursor,
-				prevCursor,
-				hasNext,
-				hasPrev,
-				perPage,
-			}),
-		},
+		createCursorPage(rows, {
+			nextCursor,
+			prevCursor,
+			hasNext,
+			hasPrev,
+			perPage,
+		}),
 		200,
 	);
 };

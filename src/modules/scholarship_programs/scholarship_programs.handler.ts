@@ -1,4 +1,4 @@
-import { createOffsetMeta, createCursorMeta } from '@/lib/pagination';
+import { createCursorPage, createOffsetPage } from '@/lib/pagination';
 import { createScholarshipProgramsRepo } from '@/repositories/scholarship_programs.repo';
 import { createScholarshipProgramsService } from '@/services/scholarship_programs.service';
 import { AppEnv } from '@/types/app';
@@ -31,10 +31,7 @@ export const listScholarshipPrograms: RouteHandler<
 	});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createOffsetMeta({ total, page, perPage }),
-		},
+		createOffsetPage({ rows, total, page, perPage }),
 		200,
 	);
 };
@@ -53,16 +50,13 @@ export const listScholarshipProgramsCursor: RouteHandler<
 		});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createCursorMeta({
-				nextCursor,
-				prevCursor,
-				hasNext,
-				hasPrev,
-				perPage,
-			}),
-		},
+		createCursorPage(rows, {
+			nextCursor,
+			prevCursor,
+			hasNext,
+			hasPrev,
+			perPage,
+		}),
 		200,
 	);
 };

@@ -1,4 +1,5 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
+import { jsonCreated, jsonOk } from '@/lib/openapi-helpers';
 import { requireAuth } from '@/middleware/require-auth';
 import { requireRole } from '@/middleware/require-role';
 import {
@@ -11,11 +12,11 @@ import {
 	StudentAllowlistImportResponseSchema,
 	StudentAllowlistVerifyQuerySchema,
 	StudentAllowlistVerifyResponseSchema,
-	StudentAllowlistsCursorQuerySchema,
 	StudentAllowlistsCursorResponseSchema,
 	StudentAllowlistsOffsetQuerySchema,
 	StudentAllowlistsOffsetResponseSchema,
 } from './student_allowlists.schema';
+import { CursorQuerySchema } from '@/lib/pagination';
 import { AppEnv } from '@/types/app';
 import {
 	importStudentAllowlists,
@@ -30,12 +31,7 @@ export const listStudentAllowlistsRoute = createRoute({
 	summary: 'List student allowlists (offset pagination)',
 	request: { query: StudentAllowlistsOffsetQuerySchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: StudentAllowlistsOffsetResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(StudentAllowlistsOffsetResponseSchema),
 	},
 });
 
@@ -44,14 +40,9 @@ export const listStudentAllowlistsCursorRoute = createRoute({
 	path: '/cursor',
 	tags: ['Student Allowlists'],
 	summary: 'List student allowlists (cursor pagination)',
-	request: { query: StudentAllowlistsCursorQuerySchema },
+	request: { query: CursorQuerySchema },
 	responses: {
-		200: {
-			content: {
-				'application/json': { schema: StudentAllowlistsCursorResponseSchema },
-			},
-			description: 'OK',
-		},
+		200: jsonOk(StudentAllowlistsCursorResponseSchema),
 	},
 });
 
@@ -72,9 +63,7 @@ export const importStudentAllowlistsRoute = createRoute({
 	},
 	responses: {
 		201: {
-			content: {
-				'application/json': { schema: StudentAllowlistImportResponseSchema },
-			},
+			...jsonCreated(StudentAllowlistImportResponseSchema),
 			description: 'Imported',
 		},
 		401: unauthorized,

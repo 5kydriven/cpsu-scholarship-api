@@ -1,6 +1,6 @@
 import type { RouteHandler } from '@hono/zod-openapi';
 import type { Context } from 'hono';
-import { createCursorMeta, createOffsetMeta } from '@/lib/pagination';
+import { createCursorPage, createOffsetPage } from '@/lib/pagination';
 import { createCoursesRepo } from '@/repositories/courses.repo';
 import { createCoursesService } from '@/services/courses.service';
 import type { AppEnv } from '@/types/app';
@@ -31,10 +31,7 @@ export const listCourses: RouteHandler<
 	});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createOffsetMeta({ total, page, perPage }),
-		},
+		createOffsetPage({ rows, total, page, perPage }),
 		200,
 	);
 };
@@ -53,16 +50,13 @@ export const listCoursesCursor: RouteHandler<
 		});
 
 	return c.json(
-		{
-			data: rows,
-			meta: createCursorMeta({
-				nextCursor,
-				prevCursor,
-				hasNext,
-				hasPrev,
-				perPage,
-			}),
-		},
+		createCursorPage(rows, {
+			nextCursor,
+			prevCursor,
+			hasNext,
+			hasPrev,
+			perPage,
+		}),
 		200,
 	);
 };

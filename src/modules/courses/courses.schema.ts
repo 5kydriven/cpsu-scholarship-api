@@ -1,50 +1,64 @@
+import { courses } from '@/db/schema';
 import {
-	CursorMetaSchema,
-	CursorQuerySchema,
-	OffsetMetaSchema,
 	OffsetQuerySchema,
 } from '@/lib/pagination';
+import {
+	createCursorResponseSchema,
+	createOffsetResponseSchema,
+	generatedFields,
+	UuidIdParamsSchema,
+} from '@/lib/common-schemas';
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from '@/lib/drizzle-zod';
 import z from 'zod';
 
-export const CourseParamsSchema = z.object({
-	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+export const CourseParamsSchema = UuidIdParamsSchema;
+
+export const courseSelectSchema = createSelectSchema(courses, {
+	id: (schema) =>
+		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+	name: (schema) =>
+		schema.openapi({
+			example: 'Bacgelor of Science in Information Technology',
+		}),
+	abbreviation: (schema) => schema.openapi({ example: 'BSIT' }),
+	major: (schema) => schema.openapi({ example: 'Programming' }),
+	createdAt: (schema) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	updatedAt: (schema) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
 });
 
-export const CreateCourseSchema = z.object({
-	name: z
-		.string()
-		.min(2)
-		.max(100)
-		.openapi({ example: 'Bachelor of Science in Information Technology' }),
-	abbreviation: z.string().min(3).max(20).openapi({ example: 'BSIT' }),
-	major: z.string().optional().openapi({ example: 'Programming' }),
+export const courseInsertSchema = createInsertSchema(courses, {
+	name: (schema) =>
+		schema.openapi({
+			example: 'Bacgelor of Science in Information Technology',
+		}),
+	abbreviation: (schema) => schema.openapi({ example: 'BSIT' }),
+	major: (schema) => schema.openapi({ example: 'Programming' }),
+}).omit({
+	...generatedFields,
 });
 
-export const UpdateCourseSchema = CreateCourseSchema.partial().refine(
-	(v) => Object.keys(v).length > 0,
-	{
-		message: 'At least one course field is required',
-	},
-);
-
-export const CourseResponseSchema = z.object({
-	id: z.uuid(),
-	name: z.string(),
-	abbreviation: z.string(),
-	major: z.string().nullable(),
-	createdAt: z.string(),
-	updatedAt: z.string(),
+export const courseUpdateSchema = createUpdateSchema(courses, {
+	name: (schema) =>
+		schema.openapi({
+			example: 'Bacgelor of Science in Information Technology',
+		}),
+	abbreviation: (schema) => schema.openapi({ example: 'BSIT' }),
+	major: (schema) => schema.openapi({ example: 'Programming' }),
+}).omit({
+	...generatedFields,
 });
 
-export const CoursesOffsetResponseSchema = z.object({
-	data: CourseResponseSchema.array(),
-	meta: OffsetMetaSchema,
-});
+export const CoursesOffsetResponseSchema =
+	createOffsetResponseSchema(courseSelectSchema);
 
-export const CoursesCursorResponseSchema = z.object({
-	data: CourseResponseSchema.array(),
-	meta: CursorMetaSchema,
-});
+export const CoursesCursorResponseSchema =
+	createCursorResponseSchema(courseSelectSchema);
 
 export const CoursesOffsetQuerySchema = OffsetQuerySchema.extend({
 	search: z.string().optional().openapi({ example: 'BSIT' }),
@@ -54,8 +68,3 @@ export const CoursesOffsetQuerySchema = OffsetQuerySchema.extend({
 		.openapi({ example: 'createdAt' }),
 	order: z.enum(['asc', 'desc']).default('desc').openapi({ example: 'desc' }),
 });
-
-export const CoursesCursorQuerySchema = CursorQuerySchema;
-
-export type UpdateCourseInput = z.infer<typeof UpdateCourseSchema>;
-export type CreateCourseInput = z.infer<typeof CreateCourseSchema>;

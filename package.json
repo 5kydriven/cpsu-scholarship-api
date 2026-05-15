@@ -4,6 +4,7 @@
 	"scripts": {
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy --minify",
+		"deploy:staging": "wrangler deploy --env staging",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
 		"docker:up": "docker compose up -d",
 		"docker:down": "docker-compose down",
@@ -12,8 +13,12 @@
 		"neon:seed": "psql \"$DATABASE_URL\" -f ./src/db/seeds/create_admin.sql",
 		"db:generate": "bun drizzle-kit generate",
 		"db:migrate": "bun drizzle-kit migrate",
+		"db:migrate:staging": "dotenv -e .env.staging -- drizzle-kit migrate",
+		"db:migrate:prod": "dotenv -e .env.production -- drizzle-kit migrate",
 		"db:studio": "bun drizzle-kit studio",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"wrangler:cors": "wrangler secret put CORS_ORIGIN --env staging",
+		"wrangler:dburl": "wrangler secret put DATABASE_URL --env staging"
 	},
 	"dependencies": {
 		"@better-auth/drizzle-adapter": "^1.6.9",
@@ -23,6 +28,7 @@
 		"better-auth": "^1.6.9",
 		"dotenv": "^17.4.2",
 		"drizzle-orm": "^0.45.2",
+		"drizzle-zod": "^0.8.3",
 		"hono": "^4.12.16",
 		"pg": "^8.20.0",
 		"xlsx": "^0.18.5",
@@ -33,6 +39,7 @@
 		"@cloudflare/workers-types": "^4.20260504.1",
 		"@types/node": "^25.6.0",
 		"@types/pg": "^8.20.0",
+		"dotenv-cli": "^11.0.0",
 		"drizzle-kit": "^0.31.10",
 		"tsx": "^4.21.0",
 		"typescript": "^6.0.3",

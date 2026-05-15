@@ -7,6 +7,8 @@ export type AppBindings = {
 	BETTER_AUTH_SECRET: string;
 	BETTER_AUTH_URL: string;
 	CORS_ORIGIN: string;
+	R2: R2Bucket;
+	PUBLIC_URL: string;
 };
 
 export type AppVariables = {

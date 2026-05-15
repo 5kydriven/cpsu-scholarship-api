@@ -83,3 +83,31 @@ export const createCursorMeta = (opts: {
 	hasPrev: boolean;
 	perPage: number;
 }) => opts;
+
+export const createOffsetPage = <Row>(opts: {
+	rows: Row[];
+	total: number;
+	page: number;
+	perPage: number;
+}) => ({
+	data: opts.rows,
+	meta: createOffsetMeta({
+		total: opts.total,
+		page: opts.page,
+		perPage: opts.perPage,
+	}),
+});
+
+export const createCursorPage = <Row>(
+	rows: Row[],
+	meta: {
+		nextCursor: string | null;
+		prevCursor: string | null;
+		hasNext: boolean;
+		hasPrev: boolean;
+		perPage: number;
+	},
+) => ({
+	data: rows,
+	meta: createCursorMeta(meta),
+});

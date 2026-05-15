@@ -1,64 +1,62 @@
+import { addresses } from '@/db/schema';
+import { OffsetQuerySchema } from '@/lib/pagination';
 import {
-	OffsetMetaSchema,
-	CursorMetaSchema,
-	OffsetQuerySchema,
-	CursorQuerySchema,
-} from '@/lib/pagination';
+	createCursorResponseSchema,
+	createOffsetResponseSchema,
+	generatedFields,
+	UuidIdParamsSchema,
+} from '@/lib/common-schemas';
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from '@/lib/drizzle-zod';
 import z from 'zod';
 
-export const AddressesParamsSchema = z.object({
-	id: z.uuid().openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
-});
+export const AddressesParamsSchema = UuidIdParamsSchema;
 
-export const CreateAddressSchema = z.object({
-	applicationId: z
-		.uuid()
-		.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
-	type: z.enum(['permanent', 'current']).openapi({ example: 'current' }),
-	province: z
-		.string()
-		.min(2)
-		.max(100)
-		.openapi({ example: 'Negros Occidental' }),
-	cityMunicipality: z
-		.string()
-		.min(2)
-		.max(100)
-		.openapi({ example: 'San Carlos City' }),
-	barangay: z.string().min(2).max(100).openapi({ example: 'Barangay V' }),
-	street: z.string().min(2).max(100).openapi({ example: 'Ylagan Extension' }),
-	zipCode: z.string().min(2).max(6).openapi({ example: '6127' }),
-});
+export const addressSchemaExamples = {
+	id: (schema: any) =>
+		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+	applicationId: (schema: any) =>
+		schema.openapi({ example: 'b2c3d4e5-f6a7-8901-bcde-f23456789012' }),
+	type: (schema: any) => schema.openapi({ example: 'permanent' }),
+	province: (schema: any) => schema.openapi({ example: 'Negros Occidental' }),
+	cityMunicipality: (schema: any) =>
+		schema.openapi({ example: 'San Carlos City' }),
+	barangay: (schema: any) => schema.openapi({ example: 'Barangay V' }),
+	street: (schema: any) => schema.openapi({ example: 'Ylagan Extension' }),
+	zipCode: (schema: any) => schema.openapi({ example: '6127' }),
+	createdAt: (schema: any) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	updatedAt: (schema: any) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+};
 
-export const UpdateAddressSchema = CreateAddressSchema.partial().refine(
-	(v) => Object.keys(v).length > 0,
-	{
-		message: 'At least one address field is required',
-	},
+export const AddressSelectSchema = createSelectSchema(
+	addresses,
+	addressSchemaExamples,
 );
 
-export const AddressResponseSchema = z.object({
-	id: z.uuid(),
-	applicationId: z.uuid(),
-	type: z.enum(['permanent', 'current']),
-	province: z.string(),
-	cityMunicipality: z.string(),
-	barangay: z.string(),
-	street: z.string().nullable(),
-	zipCode: z.string(),
-	createdAt: z.string(),
-	updatedAt: z.string(),
+export const AddressInsertSchema = createInsertSchema(
+	addresses,
+	addressSchemaExamples,
+).omit({
+	...generatedFields,
 });
 
-export const AddressesOffsetResponseSchema = z.object({
-	data: AddressResponseSchema.array(),
-	meta: OffsetMetaSchema,
+export const AddressUpdateSchema = createUpdateSchema(
+	addresses,
+	addressSchemaExamples,
+).omit({
+	...generatedFields,
 });
 
-export const AddressesCursorResponseSchema = z.object({
-	data: AddressResponseSchema.array(),
-	meta: CursorMetaSchema,
-});
+export const AddressesOffsetResponseSchema =
+	createOffsetResponseSchema(AddressSelectSchema);
+
+export const AddressesCursorResponseSchema =
+	createCursorResponseSchema(AddressSelectSchema);
 
 export const AddressesOffsetQuerySchema = OffsetQuerySchema.extend({
 	search: z.string().optional().openapi({ example: 'Jl. Raya' }),
@@ -68,8 +66,3 @@ export const AddressesOffsetQuerySchema = OffsetQuerySchema.extend({
 		.openapi({ example: 'createdAt' }),
 	order: z.enum(['asc', 'desc']).default('desc').openapi({ example: 'desc' }),
 });
-
-export const AddressesCursorQuerySchema = CursorQuerySchema;
-
-export type UpdateAddressInput = z.infer<typeof UpdateAddressSchema>;
-export type CreateAddressInput = z.infer<typeof CreateAddressSchema>;
