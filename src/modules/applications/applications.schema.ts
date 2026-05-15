@@ -1,17 +1,17 @@
 import z from 'zod';
 import { applications } from '@/db/schema';
 import { courseSelectSchema } from '../courses/courses.schema';
-import { parentInsertSchema, parentSelectSchema } from '../parents/parents.schema';
+import {
+	parentInsertSchema,
+	parentSelectSchema,
+} from '../parents/parents.schema';
 import { ProgramOfferingResponseSchema } from '../program_offerings/program_offerings.schema';
 import {
 	AddressInsertSchema,
 	AddressSelectSchema,
 } from '../addresses/addresses.schema';
 import { generatedFields, UuidIdParamsSchema } from '@/lib/common-schemas';
-import {
-	createInsertSchema,
-	createSelectSchema,
-} from '@/lib/drizzle-zod';
+import { createInsertSchema, createSelectSchema } from '@/lib/drizzle-zod';
 
 export const ApplicationsParamsSchema = UuidIdParamsSchema;
 
@@ -34,10 +34,12 @@ const applicationSchemaExamples = {
 	gwa: (schema: any) => schema.openapi({ example: '1.75' }),
 	citizenship: (schema: any) => schema.openapi({ example: 'Filipino' }),
 	birthplace: (schema: any) => schema.openapi({ example: 'San Carlos City' }),
-	email: (schema: any) => schema.openapi({ example: 'maria.santos@example.com' }),
+	email: (schema: any) =>
+		schema.openapi({ example: 'maria.santos@example.com' }),
 	numberOfSiblings: (schema: any) => schema.openapi({ example: '3' }),
 	contactNumber: (schema: any) => schema.openapi({ example: '+639171234567' }),
 	schoolSector: (schema: any) => schema.openapi({ example: 'public' }),
+	status: (schema: any) => schema.openapi({ example: 'pending' }),
 	schoolName: (schema: any) =>
 		schema.openapi({ example: 'Central Philippines State University' }),
 	schoolAddress: (schema: any) =>
@@ -89,11 +91,13 @@ export const applicationInsertSchema = createInsertSchema(
 		...generatedFields,
 	})
 	.extend({
-		addresses: applicationAddressInputSchema.array().length(2).openapi({
-			description: 'Exactly two address records for the application',
+		addresses: applicationAddressInputSchema.array().min(1).max(2).openapi({
+			description:
+				'At least one and at most two address records are required for the application',
 		}),
-		parents: applicationParentInputSchema.array().length(2).openapi({
-			description: 'Exactly two parent or guardian records for the application',
+		parents: applicationParentInputSchema.array().min(1).max(2).openapi({
+			description:
+				'At least one and at most two parent or guardian records are required for the application',
 		}),
 	});
 

@@ -1,4 +1,4 @@
-import { staffProfile } from '@/db/schema';
+import { staffProfiles } from '@/db/schema';
 import {
 	OffsetQuerySchema,
 } from '@/lib/pagination';
@@ -17,7 +17,7 @@ import z from 'zod';
 
 export const StaffProfileParamsSchema = UuidIdParamsSchema;
 
-export const StaffProfileSelectSchema = createSelectSchema(staffProfile, {
+export const StaffProfileSelectSchema = createSelectSchema(staffProfiles, {
 	id: (schema) =>
 		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
 	userId: (schema) => schema.openapi({ example: 'user_123' }),
@@ -32,7 +32,7 @@ export const StaffProfileSelectSchema = createSelectSchema(staffProfile, {
 		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
 });
 
-export const StaffProfileInsertSchema = createInsertSchema(staffProfile, {
+export const StaffProfileInsertSchema = createInsertSchema(staffProfiles, {
 	firstName: (schema) => schema.min(1).max(100).openapi({ example: 'Juan' }),
 	lastName: (schema) =>
 		schema.min(1).max(100).openapi({ example: 'Dela Cruz' }),
@@ -46,7 +46,7 @@ export const StaffProfileInsertSchema = createInsertSchema(staffProfile, {
 	...generatedUserOwnedFields,
 });
 
-export const StaffProfileUpdateSchema = createUpdateSchema(staffProfile, {
+export const StaffProfileUpdateSchema = createUpdateSchema(staffProfiles, {
 	firstName: (schema) => schema.min(1).max(100).openapi({ example: 'Juan' }),
 	lastName: (schema) =>
 		schema.min(1).max(100).openapi({ example: 'Dela Cruz' }),

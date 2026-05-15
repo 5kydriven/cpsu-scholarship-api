@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 
-export const staffProfile = pgTable('staff_profiles', {
+export const staffProfiles = pgTable('staff_profiles', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	userId: text('user_id')
 		.notNull()
@@ -20,5 +20,5 @@ export const staffProfile = pgTable('staff_profiles', {
 		.notNull(),
 });
 
-export type StaffProfile = typeof staffProfile.$inferSelect;
-export type NewStaffProfile = typeof staffProfile.$inferInsert;
+export type StaffProfile = typeof staffProfiles.$inferSelect;
+export type NewStaffProfile = typeof staffProfiles.$inferInsert;

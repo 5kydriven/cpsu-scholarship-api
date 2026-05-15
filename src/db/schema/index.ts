@@ -3,6 +3,7 @@ export * from './applications';
 export * from './auth';
 export * from './course';
 export * from './parents';
+export * from './payouts';
 export * from './program_offerings';
 export * from './scholarship_program';
 export * from './staff_profiles';
