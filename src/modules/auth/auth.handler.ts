@@ -5,8 +5,10 @@ import { appendAuthHeaders } from '@/lib/auth-headers';
 import { isUserRole } from '@/constants/roles';
 import { Errors } from '@/lib/errors';
 import { normalizeStudentNumber } from '@/lib/student-number';
+import { createStaffProfilesRepo } from '@/repositories/staff_profiles.repo';
 import { createStudentAllowlistsRepo } from '@/repositories/student_allowlists.repo';
 import { createStudentsRepo } from '@/repositories/students.repo';
+import { createStaffProfilesService } from '@/services/staff_profiles.service';
 import { createStudentAllowlistService } from '@/services/student_allowlist.service';
 import { createStudentsService } from '@/services/students.service';
 import type { AppEnv } from '@/types/app';
@@ -24,6 +26,9 @@ const getStudentAllowlistService = (c: Context<AppEnv>) =>
 
 const getStudentsService = (c: Context<AppEnv>) =>
 	createStudentsService(createStudentsRepo(c.get('db')));
+
+const getStaffProfilesService = (c: Context<AppEnv>) =>
+	createStaffProfilesService(createStaffProfilesRepo(c.get('db')));
 
 const toAuthUser = (user: {
 	id: string;
@@ -167,9 +172,8 @@ export const studentRegister: RouteHandler<
 
 	return c.json(
 		{
-			studentNumber: createdStudent.studentNumber,
-			name: createdStudent.name,
-			email: createdStudent.email,
+			user: toAuthUser(createdUser),
+			student: createdStudent,
 		},
 		200,
 	);
@@ -204,9 +208,8 @@ export const studentLogin: RouteHandler<
 
 	return c.json(
 		{
-			studentNumber: student.studentNumber,
-			name: student.name,
-			email: student.email,
+			user: toAuthUser(result.response.user),
+			student,
 		},
 		200,
 	);
@@ -235,6 +238,15 @@ export const me: RouteHandler<typeof meRoute, AppEnv> = async (c) => {
 		});
 	}
 
+	const student =
+		user.role === 'student'
+			? await getStudentsService(c).findByUserId(user.id)
+			: null;
+	const staff =
+		user.role !== 'student'
+			? await getStaffProfilesService(c).findByUserId(user.id)
+			: null;
+
 	return c.json(
 		{
 			user,
@@ -243,6 +255,8 @@ export const me: RouteHandler<typeof meRoute, AppEnv> = async (c) => {
 				userId: session.userId,
 				expiresAt: session.expiresAt.toISOString(),
 			},
+			student,
+			staff,
 		},
 		200,
 	);

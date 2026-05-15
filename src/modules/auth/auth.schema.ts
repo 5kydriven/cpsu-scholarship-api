@@ -1,5 +1,8 @@
 import { z } from '@hono/zod-openapi';
 import { USER_ROLES } from '@/constants/roles';
+import { student } from '@/db/schema';
+import { createSelectSchema } from '@/lib/drizzle-zod';
+import { StaffProfileSelectSchema } from '@/modules/staff_profiles/staff_profiles.schema';
 
 export const RegisterSchema = z.object({
 	name: z.string().min(1).max(100).openapi({ example: 'Maria Santos' }),
@@ -46,11 +49,22 @@ export const StudentAuthProfileSchema = z.object({
 	email: z.email().optional().openapi({ example: 'student@example.com' }),
 });
 
+export const StudentProfileSchema = createSelectSchema(student, {
+	id: (schema) =>
+		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
+	userId: (schema) => schema.openapi({ example: 'user_123' }),
+	studentNumber: (schema) => schema.openapi({ example: '2025-0015-R' }),
+	name: (schema) => schema.openapi({ example: 'ABELO, JANEL' }),
+	email: (schema) => schema.openapi({ example: 'student@example.com' }),
+	createdAt: (schema) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+	updatedAt: (schema) =>
+		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
+});
+
 export const StudentAuthResponseSchema = z.object({
 	user: AuthUserSchema,
-	student: StudentAuthProfileSchema.extend({
-		email: z.email().openapi({ example: 'student@example.com' }),
-	}),
+	student: StudentProfileSchema,
 });
 
 export const StudentVerifyResponseSchema = z.object({
@@ -71,6 +85,8 @@ export const SessionResponseSchema = z.object({
 export const MeResponseSchema = z.object({
 	user: AuthUserSchema,
 	session: SessionResponseSchema,
+	student: StudentProfileSchema.nullable(),
+	staff: StaffProfileSelectSchema.nullable(),
 });
 
 export const LogoutResponseSchema = z.object({

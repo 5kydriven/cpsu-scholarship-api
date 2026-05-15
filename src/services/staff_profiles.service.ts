@@ -58,6 +58,10 @@ export const createStaffProfilesService = (
 		return personnel;
 	},
 
+	async findByUserId(userId: string) {
+		return staffProfilesRepo.findByUserId(userId);
+	},
+
 	async update(id: string, data: UpdateStaffProfileInput) {
 		const updated = await staffProfilesRepo.update(id, data);
 		if (!updated) throw Errors.notFound('Personnel not found');

@@ -3,9 +3,11 @@ import type { StudentsRepo } from '@/repositories/students.repo';
 
 export const createStudentsService = (studentsRepo: StudentsRepo) => ({
 	async findByStudentNumber(studentNumber: string) {
-		const student = studentsRepo.findByStudentNumber(studentNumber);
-		if (!student) throw Errors.notFound('Student not found');
-		return student;
+		return studentsRepo.findByStudentNumber(studentNumber);
+	},
+
+	async findByUserId(userId: string) {
+		return studentsRepo.findByUserId(userId);
 	},
 
 	async create(data: {

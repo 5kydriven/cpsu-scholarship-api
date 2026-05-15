@@ -11,6 +11,14 @@ export const createStudentsRepo = (db: Db) => ({
 			.limit(1)
 			.then((r) => r[0] ?? null),
 
+	findByUserId: (userId: string) =>
+		db
+			.select()
+			.from(student)
+			.where(eq(student.userId, userId))
+			.limit(1)
+			.then((r) => r[0] ?? null),
+
 	create: (data: NewStudent) =>
 		db
 			.insert(student)
