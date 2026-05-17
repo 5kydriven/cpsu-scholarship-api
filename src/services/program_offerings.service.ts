@@ -12,19 +12,52 @@ export const createProgramOfferingsService = (
 	},
 
 	async softDelete(id: string) {
+		const existing = await programOfferingsRepo.findById(id);
+		if (!existing) throw Errors.notFound('Program Offering not found');
+		if (existing.isActive) {
+			throw Errors.conflict('Active offerings cannot be archived');
+		}
+
 		const programOffering = await programOfferingsRepo.softDelete(id);
 		if (!programOffering) throw Errors.notFound('Program Offering not found');
 		return programOffering;
 	},
 
 	async create(programOffering: NewProgramOffering) {
-		return programOfferingsRepo.create(programOffering);
+		return programOfferingsRepo.create({
+			...programOffering,
+			isActive: true,
+			isArchived: false,
+		});
 	},
 
 	async update(id: string, programOffering: Partial<NewProgramOffering>) {
 		const programOfferingToUpdate = await programOfferingsRepo.findById(id);
 		if (!programOfferingToUpdate)
 			throw Errors.notFound('Program Offering not found');
+
+		if (programOfferingToUpdate.isArchived) {
+			throw Errors.conflict('Archived offerings are read-only');
+		}
+
+		const nextIsActive = programOffering.isActive ?? programOfferingToUpdate.isActive;
+		const nextIsArchived =
+			programOffering.isArchived ?? programOfferingToUpdate.isArchived;
+
+		if (!programOfferingToUpdate.isActive && programOffering.isActive === true) {
+			throw Errors.conflict('Closed offerings cannot be reopened');
+		}
+
+		if (nextIsActive && nextIsArchived) {
+			throw Errors.conflict(
+				'An offering cannot be both active and archived at the same time',
+			);
+		}
+
+		if (programOffering.isArchived === true && programOfferingToUpdate.isActive) {
+			throw Errors.conflict('Only closed offerings can be archived');
+		}
+
 		return programOfferingsRepo.update(id, programOffering);
 	},
 

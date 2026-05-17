@@ -25,7 +25,7 @@ export const orderApplicationsByIds = (
 		.filter((application): application is ApplicationRecord => !!application);
 };
 
-const isUniqueConstraintError = (error: unknown) =>
+export const isUniqueConstraintError = (error: unknown) =>
 	typeof error === 'object' &&
 	error !== null &&
 	'code' in error &&
@@ -34,6 +34,16 @@ const isUniqueConstraintError = (error: unknown) =>
 export const toCreateApplicationError = (error: unknown) => {
 	if (isUniqueConstraintError(error)) {
 		return Errors.conflict('Application already exists for this offering');
+	}
+
+	return error;
+};
+
+export const toApproveApplicationError = (error: unknown) => {
+	if (isUniqueConstraintError(error)) {
+		return Errors.conflict(
+			'This student already has an approved application in the system.',
+		);
 	}
 
 	return error;

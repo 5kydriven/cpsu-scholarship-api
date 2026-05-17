@@ -1,5 +1,12 @@
 import { relations } from 'drizzle-orm';
-import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+	boolean,
+	index,
+	pgTable,
+	text,
+	timestamp,
+	uuid,
+} from 'drizzle-orm/pg-core';
 import { user } from './auth';
 import { courses } from './course';
 import { studentAllowlist } from './student_allowlist';
@@ -23,6 +30,7 @@ export const student = pgTable(
 		extName: text('ext_name'),
 		courseId: uuid('course_id').references(() => courses.id),
 		email: text('email').notNull(),
+		isScholar: boolean('is_scholar').notNull().default(false),
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
 			.defaultNow()
 			.notNull(),

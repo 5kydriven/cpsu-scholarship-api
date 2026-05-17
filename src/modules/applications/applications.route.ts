@@ -24,6 +24,7 @@ import {
 	getApplication,
 	listApplications,
 	listApplicationsCursor,
+	rejectApplication,
 } from './applications.handler';
 import {
 	acceptApplicationsBodySchema,
@@ -124,6 +125,24 @@ export const acceptApplicationRoute = createRoute({
 	},
 });
 
+export const rejectApplicationRoute = createRoute({
+	method: 'post',
+	path: '/{id}/reject',
+	tags: ['Applications'],
+	summary: 'Reject an application (admin/personnel only)',
+	request: {
+		params: ApplicationsParamsSchema,
+	},
+	responses: {
+		200: jsonOk(applicationWithRelationsSchema),
+		401: unauthorized,
+		403: forbidden,
+		404: notFound,
+		409: conflict,
+		422: validationError,
+	},
+});
+
 export const acceptApplicationsRoute = createRoute({
 	method: 'post',
 	path: '/accept',
@@ -154,6 +173,8 @@ applicationsRoute.use('/accept', requireRole('personnel'));
 applicationsRoute.openapi(acceptApplicationsRoute, acceptApplications);
 applicationsRoute.use('/:id/accept', requireRole('personnel'));
 applicationsRoute.openapi(acceptApplicationRoute, acceptApplication);
+applicationsRoute.use('/:id/reject', requireRole('personnel'));
+applicationsRoute.openapi(rejectApplicationRoute, rejectApplication);
 applicationsRoute.use('/:id', requireRole('personnel'));
 applicationsRoute.openapi(getApplicationRoute, getApplication);
 applicationsRoute.openapi(deleteApplicationRoute, deleteApplication);

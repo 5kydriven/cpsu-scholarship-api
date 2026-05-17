@@ -8,6 +8,7 @@ import {
 	finalApplicationStatuses,
 	orderApplicationsByIds,
 	toApplicationResponse,
+	toApproveApplicationError,
 	toCreateApplicationError,
 } from '@/utils/application-helpers';
 
@@ -87,14 +88,31 @@ export const createApplicationsService = (
 		}
 
 		const reviewedAt = new Date().toISOString();
-		const [acceptedApplication] = await applicationsRepo.acceptMany(
-			[id],
-			reviewedBy,
-			reviewedAt,
-		);
+		const result = await applicationsRepo
+			.approveMany([id], reviewedBy, reviewedAt)
+			.catch((error) => {
+				throw toApproveApplicationError(error);
+			});
 
+		if (result.type === 'missing') {
+			throw Errors.notFound('Application not found');
+		}
+
+		if (result.type === 'final') {
+			throw Errors.conflict(
+				`Application is already ${result.applications[0].status}`,
+			);
+		}
+
+		if (result.type === 'budget_exceeded') {
+			throw Errors.conflict(
+				"Approving this application would exceed the offering's total budget.",
+			);
+		}
+
+		const [acceptedApplication] = result.applications;
 		if (!acceptedApplication) {
-			throw Errors.internal('Accepted application could not be loaded');
+			throw Errors.internal('Approved application could not be loaded');
 		}
 
 		return toApplicationResponse(acceptedApplication);
@@ -128,13 +146,34 @@ export const createApplicationsService = (
 		}
 
 		const reviewedAt = new Date().toISOString();
-		const acceptedApplications = await applicationsRepo.acceptMany(
-			uniqueIds,
-			reviewedBy,
-			reviewedAt,
-		);
+		const result = await applicationsRepo
+			.approveMany(uniqueIds, reviewedBy, reviewedAt)
+			.catch((error) => {
+				throw toApproveApplicationError(error);
+			});
+
+		if (result.type === 'missing') {
+			throw Errors.notFound(
+				`Applications not found: ${result.missingIds.join(', ')}`,
+			);
+		}
+
+		if (result.type === 'final') {
+			throw Errors.conflict(
+				`Applications already finalized: ${result.applications
+					.map((application) => application.id)
+					.join(', ')}`,
+			);
+		}
+
+		if (result.type === 'budget_exceeded') {
+			throw Errors.conflict(
+				"Approving this application would exceed the offering's total budget.",
+			);
+		}
+
 		const orderedApplications = orderApplicationsByIds(
-			acceptedApplications,
+			result.applications,
 			uniqueIds,
 		);
 
@@ -143,6 +182,25 @@ export const createApplicationsService = (
 		}
 
 		return { data: orderedApplications.map(toApplicationResponse) };
+	},
+
+	async reject(id: string, reviewedBy: string) {
+		const reviewedAt = new Date().toISOString();
+		const result = await applicationsRepo.reject(id, reviewedBy, reviewedAt);
+
+		if (result.type === 'missing') {
+			throw Errors.notFound('Application not found');
+		}
+
+		if (result.type === 'final') {
+			throw Errors.conflict(`Application is already ${result.application.status}`);
+		}
+
+		if (!result.application) {
+			throw Errors.internal('Rejected application could not be loaded');
+		}
+
+		return toApplicationResponse(result.application);
 	},
 
 	async update(id: string, application: Partial<NewApplication>) {

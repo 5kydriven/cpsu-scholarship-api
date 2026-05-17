@@ -15,6 +15,12 @@ import z from 'zod';
 
 export const ProgramOfferingParamsSchema = UuidIdParamsSchema;
 
+const positiveMoneySchema = z
+	.string()
+	.refine((value) => Number.isFinite(Number(value)) && Number(value) > 0, {
+		message: 'Must be greater than 0',
+	});
+
 export const ProgramOfferingResponseSchema = createSelectSchema(
 	programOfferings,
 	{
@@ -25,6 +31,8 @@ export const ProgramOfferingResponseSchema = createSelectSchema(
 		schoolYear: (schema) =>
 			schema.max(20).openapi({ example: '2023 - 2024' }),
 		totalBudget: (schema) => schema.openapi({ example: '1000000.00' }),
+		amountPerSemester: (schema) => schema.openapi({ example: '7000.00' }),
+		pwdAdditional: (schema) => schema.openapi({ example: '2000.00' }),
 		isActive: (schema) => schema.openapi({ example: true }),
 		isArchived: (schema) => schema.openapi({ example: false }),
 		createdAt: (schema) =>
@@ -39,22 +47,45 @@ export const CreateProgramOfferingSchema = createInsertSchema(programOfferings, 
 		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
 	schoolYear: (schema) => schema.max(20).openapi({ example: '2023 - 2024' }),
 	totalBudget: (schema) => schema.openapi({ example: '1000000.00' }),
+	amountPerSemester: (schema) => schema.openapi({ example: '7000.00' }),
+	pwdAdditional: (schema) => schema.openapi({ example: '2000.00' }),
 	isActive: (schema) => schema.openapi({ example: true }),
 	isArchived: (schema) => schema.openapi({ example: false }),
-}).omit({
-	...generatedFields,
-});
+})
+	.omit({
+		...generatedFields,
+		isActive: true,
+		isArchived: true,
+	})
+	.extend({
+		totalBudget: positiveMoneySchema.openapi({ example: '1000000.00' }),
+		amountPerSemester: positiveMoneySchema.openapi({ example: '7000.00' }),
+		pwdAdditional: positiveMoneySchema.openapi({ example: '2000.00' }),
+	});
 
 export const UpdateProgramOfferingSchema = createUpdateSchema(programOfferings, {
 	scholarshipProgramId: (schema) =>
 		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
 	schoolYear: (schema) => schema.max(20).openapi({ example: '2023 - 2024' }),
 	totalBudget: (schema) => schema.openapi({ example: '1000000.00' }),
+	amountPerSemester: (schema) => schema.openapi({ example: '7000.00' }),
+	pwdAdditional: (schema) => schema.openapi({ example: '2000.00' }),
 	isActive: (schema) => schema.openapi({ example: true }),
 	isArchived: (schema) => schema.openapi({ example: false }),
 })
 	.omit({
 		...generatedFields,
+	})
+	.extend({
+		totalBudget: positiveMoneySchema.optional().openapi({
+			example: '1000000.00',
+		}),
+		amountPerSemester: positiveMoneySchema.optional().openapi({
+			example: '7000.00',
+		}),
+		pwdAdditional: positiveMoneySchema.optional().openapi({
+			example: '2000.00',
+		}),
 	})
 	.refine(
 		(value) => Object.keys(value).length > 0,

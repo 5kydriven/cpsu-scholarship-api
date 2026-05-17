@@ -1,5 +1,7 @@
+import { sql } from 'drizzle-orm';
 import {
 	boolean,
+	check,
 	index,
 	numeric,
 	pgTable,
@@ -21,6 +23,15 @@ export const programOfferings = pgTable(
 		),
 		schoolYear: text('school_year').notNull(),
 		totalBudget: numeric('total_budget', { precision: 10, scale: 2 }).notNull(),
+		amountPerSemester: numeric('amount_per_semester', {
+			precision: 10,
+			scale: 2,
+		})
+			.notNull()
+			.default('0'),
+		pwdAdditional: numeric('pwd_additional', { precision: 10, scale: 2 })
+			.notNull()
+			.default('0'),
 		isActive: boolean('is_active').notNull().default(true),
 		isArchived: boolean('is_archived').notNull().default(false),
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
@@ -32,6 +43,10 @@ export const programOfferings = pgTable(
 	},
 	(table) => [
 		index('idx_program_offerings_program_id').on(table.scholarshipProgramId),
+		check(
+			'chk_no_active_archived',
+			sql`NOT (${table.isActive} = true AND ${table.isArchived} = true)`,
+		),
 	],
 );
 
