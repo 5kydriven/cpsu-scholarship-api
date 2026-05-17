@@ -155,6 +155,13 @@
       "when": 1778857202123,
       "tag": "0021_lethal_ronan",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1778998302369,
+      "tag": "0022_brief_leopardon",
+      "breakpoints": true
     }
   ]
 }

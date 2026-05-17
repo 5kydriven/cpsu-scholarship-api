@@ -62,6 +62,7 @@ export const StudentProfileSchema = createSelectSchema(student, {
 	courseId: (schema) =>
 		schema.openapi({ example: 'd4e5f6a7-b8c9-0123-defa-456789012345' }),
 	email: (schema) => schema.openapi({ example: 'student@example.com' }),
+	isScholar: (schema) => schema.openapi({ example: false }),
 	createdAt: (schema) =>
 		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
 	updatedAt: (schema) =>

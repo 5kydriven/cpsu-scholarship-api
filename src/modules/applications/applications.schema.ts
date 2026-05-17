@@ -72,6 +72,11 @@ const applicationSchemaExamples = {
 		schema.openapi({ example: 'applications/a1b2c3/ip-certificate.pdf' }),
 	fourPsUrl: (schema: any) =>
 		schema.openapi({ example: 'applications/a1b2c3/fourps-certificate.pdf' }),
+	yearLevelAtApproval: (schema: any) =>
+		schema.openapi({ example: '3rd Year' }),
+	expectedGraduationSy: (schema: any) =>
+		schema.openapi({ example: '2025-2026' }),
+	maxPayoutSy: (schema: any) => schema.openapi({ example: '2025-2026' }),
 	createdAt: (schema: any) =>
 		schema.openapi({ example: '2026-05-09T12:00:00.000Z' }),
 	updatedAt: (schema: any) =>
@@ -131,6 +136,9 @@ export const applicationInsertSchema = createInsertSchema(
 		status: true,
 		reviewedBy: true,
 		reviewedAt: true,
+		yearLevelAtApproval: true,
+		expectedGraduationSy: true,
+		maxPayoutSy: true,
 	})
 	.extend({
 		addresses: applicationAddressInputSchema.array().min(1).max(2).openapi({

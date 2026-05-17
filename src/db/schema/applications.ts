@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
 	index,
 	pgEnum,
@@ -60,6 +60,9 @@ export const applications = pgTable(
 			withTimezone: true,
 			mode: 'string',
 		}),
+		yearLevelAtApproval: text('year_level_at_approval'),
+		expectedGraduationSy: text('expected_graduation_sy'),
+		maxPayoutSy: text('max_payout_sy'),
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
 			.defaultNow()
 			.notNull(),
@@ -72,6 +75,9 @@ export const applications = pgTable(
 			table.studentId,
 			table.offeringId,
 		),
+		uniqueIndex('one_approved_per_student')
+			.on(table.studentId)
+			.where(sql`${table.status} = 'approved'`),
 		index('idx_applications_offering_id').on(table.offeringId),
 		index('idx_applications_course_id').on(table.courseId),
 		index('idx_applications_status').on(table.status),

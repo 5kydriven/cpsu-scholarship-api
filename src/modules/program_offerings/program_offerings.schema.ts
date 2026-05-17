@@ -25,6 +25,8 @@ export const ProgramOfferingResponseSchema = createSelectSchema(
 		schoolYear: (schema) =>
 			schema.max(20).openapi({ example: '2023 - 2024' }),
 		totalBudget: (schema) => schema.openapi({ example: '1000000.00' }),
+		amountPerSemester: (schema) => schema.openapi({ example: '7000.00' }),
+		pwdAdditional: (schema) => schema.openapi({ example: '2000.00' }),
 		isActive: (schema) => schema.openapi({ example: true }),
 		isArchived: (schema) => schema.openapi({ example: false }),
 		createdAt: (schema) =>
@@ -39,6 +41,8 @@ export const CreateProgramOfferingSchema = createInsertSchema(programOfferings, 
 		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
 	schoolYear: (schema) => schema.max(20).openapi({ example: '2023 - 2024' }),
 	totalBudget: (schema) => schema.openapi({ example: '1000000.00' }),
+	amountPerSemester: (schema) => schema.openapi({ example: '7000.00' }),
+	pwdAdditional: (schema) => schema.openapi({ example: '2000.00' }),
 	isActive: (schema) => schema.openapi({ example: true }),
 	isArchived: (schema) => schema.openapi({ example: false }),
 }).omit({
@@ -50,6 +54,8 @@ export const UpdateProgramOfferingSchema = createUpdateSchema(programOfferings, 
 		schema.openapi({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' }),
 	schoolYear: (schema) => schema.max(20).openapi({ example: '2023 - 2024' }),
 	totalBudget: (schema) => schema.openapi({ example: '1000000.00' }),
+	amountPerSemester: (schema) => schema.openapi({ example: '7000.00' }),
+	pwdAdditional: (schema) => schema.openapi({ example: '2000.00' }),
 	isActive: (schema) => schema.openapi({ example: true }),
 	isArchived: (schema) => schema.openapi({ example: false }),
 })
