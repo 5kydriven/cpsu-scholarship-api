@@ -16,6 +16,7 @@ import { parentsRoute } from './modules/parents/parents.route';
 import { addressesRoute } from './modules/addresses/addresses.route';
 import { applicationsRoute } from './modules/applications/applications.route';
 import { filesRoute } from './modules/files/files.route';
+import { payoutsRoute } from './modules/payouts/payouts.route';
 
 const app = new OpenAPIHono<AppEnv>();
 
@@ -75,6 +76,7 @@ app.route('/api/v1/student-allowlists', studentAllowlistsRoute);
 app.route('/api/v1/scholarship-programs', scholarshipProgramsRoute);
 app.route('/api/v1/program-offerings', programOfferingsRoute);
 app.route('/api/v1/applications', applicationsRoute);
+app.route('/api/v1/payouts', payoutsRoute);
 app.route('/api/v1/parents', parentsRoute);
 app.route('/api/v1/addresses', addressesRoute);
 app.route('/api/v1/files', filesRoute);

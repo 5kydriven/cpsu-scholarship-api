@@ -1,9 +1,11 @@
 import { relations } from 'drizzle-orm';
 import {
+	boolean,
 	index,
 	numeric,
 	pgEnum,
 	pgTable,
+	text,
 	timestamp,
 	uuid,
 } from 'drizzle-orm/pg-core';
@@ -27,6 +29,14 @@ export const payouts = pgTable(
 		semester: payoutSemesterEnum('semester').notNull(),
 		amount: numeric('amount', { precision: 10, scale: 2 }),
 		status: payoutStatusEnum('status').default('pending').notNull(),
+		isClaimable: boolean('is_claimable').notNull().default(false),
+		claimableBy: uuid('claimable_by').references(() => staffProfiles.id),
+		claimableAt: timestamp('claimable_at', {
+			withTimezone: true,
+			mode: 'string',
+		}),
+		checkNo: text('check_no'),
+		checkImageUrl: text('check_image_url'),
 		releasedBy: uuid('released_by').references(() => staffProfiles.id),
 		releasedAt: timestamp('released_at', {
 			withTimezone: true,
@@ -52,6 +62,10 @@ export const payoutsRelations = relations(payouts, ({ one }) => ({
 	}),
 	releasedByStaff: one(staffProfiles, {
 		fields: [payouts.releasedBy],
+		references: [staffProfiles.id],
+	}),
+	claimableByStaff: one(staffProfiles, {
+		fields: [payouts.claimableBy],
 		references: [staffProfiles.id],
 	}),
 }));

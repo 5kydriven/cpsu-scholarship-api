@@ -15,6 +15,12 @@ import z from 'zod';
 
 export const ProgramOfferingParamsSchema = UuidIdParamsSchema;
 
+const positiveMoneySchema = z
+	.string()
+	.refine((value) => Number.isFinite(Number(value)) && Number(value) > 0, {
+		message: 'Must be greater than 0',
+	});
+
 export const ProgramOfferingResponseSchema = createSelectSchema(
 	programOfferings,
 	{
@@ -45,9 +51,17 @@ export const CreateProgramOfferingSchema = createInsertSchema(programOfferings, 
 	pwdAdditional: (schema) => schema.openapi({ example: '2000.00' }),
 	isActive: (schema) => schema.openapi({ example: true }),
 	isArchived: (schema) => schema.openapi({ example: false }),
-}).omit({
-	...generatedFields,
-});
+})
+	.omit({
+		...generatedFields,
+		isActive: true,
+		isArchived: true,
+	})
+	.extend({
+		totalBudget: positiveMoneySchema.openapi({ example: '1000000.00' }),
+		amountPerSemester: positiveMoneySchema.openapi({ example: '7000.00' }),
+		pwdAdditional: positiveMoneySchema.openapi({ example: '2000.00' }),
+	});
 
 export const UpdateProgramOfferingSchema = createUpdateSchema(programOfferings, {
 	scholarshipProgramId: (schema) =>
@@ -61,6 +75,17 @@ export const UpdateProgramOfferingSchema = createUpdateSchema(programOfferings, 
 })
 	.omit({
 		...generatedFields,
+	})
+	.extend({
+		totalBudget: positiveMoneySchema.optional().openapi({
+			example: '1000000.00',
+		}),
+		amountPerSemester: positiveMoneySchema.optional().openapi({
+			example: '7000.00',
+		}),
+		pwdAdditional: positiveMoneySchema.optional().openapi({
+			example: '2000.00',
+		}),
 	})
 	.refine(
 		(value) => Object.keys(value).length > 0,

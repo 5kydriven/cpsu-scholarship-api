@@ -15,6 +15,7 @@ import type {
 	getApplicationRoute,
 	listApplicationsCursorRoute,
 	listApplicationsRoute,
+	rejectApplicationRoute,
 } from './applications.route';
 
 const getApplicationsService = (c: Context<AppEnv>) =>
@@ -99,6 +100,17 @@ export const acceptApplication: RouteHandler<
 	const { id } = c.req.valid('param');
 	const service = getApplicationsService(c);
 	const result = await service.accept(id, c.get('user')?.id ?? '');
+
+	return c.json(result, 200);
+};
+
+export const rejectApplication: RouteHandler<
+	typeof rejectApplicationRoute,
+	AppEnv
+> = async (c) => {
+	const { id } = c.req.valid('param');
+	const service = getApplicationsService(c);
+	const result = await service.reject(id, c.get('user')?.id ?? '');
 
 	return c.json(result, 200);
 };

@@ -6,6 +6,7 @@ const allowedFileTypes = new Set([
 	'image/jpeg',
 	'image/png',
 ]);
+const allowedImageTypes = new Set(['image/jpeg', 'image/png']);
 
 const isUploadedFile = (value: unknown): value is File =>
 	typeof value === 'object' &&
@@ -40,4 +41,16 @@ export const fileValidator = (value: unknown) => {
 	}
 
 	return value;
+};
+
+export const imageValidator = (value: unknown) => {
+	const file = fileValidator(value);
+
+	if (!allowedImageTypes.has(file.type)) {
+		throw Errors.validation([
+			{ field: 'file', message: 'Only JPEG and PNG images are allowed' },
+		]);
+	}
+
+	return file;
 };
