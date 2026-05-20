@@ -17,6 +17,7 @@ import { addressesRoute } from './modules/addresses/addresses.route';
 import { applicationsRoute } from './modules/applications/applications.route';
 import { filesRoute } from './modules/files/files.route';
 import { payoutsRoute } from './modules/payouts/payouts.route';
+import { analyticsRoute } from './modules/analytics/analytics.route';
 
 const app = new OpenAPIHono<AppEnv>();
 
@@ -80,5 +81,6 @@ app.route('/api/v1/payouts', payoutsRoute);
 app.route('/api/v1/parents', parentsRoute);
 app.route('/api/v1/addresses', addressesRoute);
 app.route('/api/v1/files', filesRoute);
+app.route('/api/v1/analytics', analyticsRoute);
 
 export default app;
