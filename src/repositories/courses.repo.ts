@@ -14,6 +14,19 @@ export const createCoursesRepo = (db: Db) => ({
 			.limit(1)
 			.then((r) => r[0] ?? null),
 
+	findByNameOrAbbreviation: async (value: string) =>
+		await db
+			.select({ id: courses.id })
+			.from(courses)
+			.where(
+				or(
+					ilike(courses.name, value),
+					ilike(courses.abbreviation, value),
+					ilike(courses.major, value),
+				),
+			)
+			.limit(2),
+
 	create: (data: NewCourse) =>
 		db
 			.insert(courses)

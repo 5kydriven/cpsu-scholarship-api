@@ -12,6 +12,11 @@ import type {
 	AnalyticsFilters,
 	AnalyticsTimeBucket,
 } from '@/modules/analytics/analytics.schema';
+import type {
+	AnalyticsBreakdownRow,
+	AnalyticsPredictionRunRow,
+	AnalyticsSeriesPoint,
+} from '@/types/analytics';
 import {
 	and,
 	asc,
@@ -23,25 +28,6 @@ import {
 	sql,
 	type SQL,
 } from 'drizzle-orm';
-
-export type AnalyticsBreakdownRow = {
-	key: string;
-	label: string;
-	value: number;
-};
-
-export type AnalyticsSeriesPoint = {
-	bucketStart: string;
-	value: number;
-};
-
-export type AnalyticsPredictionRunRow = {
-	runId: string;
-	offeringId: string;
-	generatedAt: string;
-	suggestedCount: number;
-	criteriaSnapshot: unknown;
-};
 
 const toCount = (rows: { value: number | string | bigint }[]) =>
 	Number(rows[0]?.value ?? 0);

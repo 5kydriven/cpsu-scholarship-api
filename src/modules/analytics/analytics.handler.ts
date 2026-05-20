@@ -1,4 +1,7 @@
 import { createAnalyticsRepo } from '@/repositories/analytics.repo';
+import { createCoursesRepo } from '@/repositories/courses.repo';
+import { createProgramOfferingsRepo } from '@/repositories/program_offerings.repo';
+import { createScholarshipProgramsRepo } from '@/repositories/scholarship_programs.repo';
 import { createAnalyticsService } from '@/services/analytics.service';
 import type { AppEnv } from '@/types/app';
 import type { RouteHandler } from '@hono/zod-openapi';
@@ -10,7 +13,13 @@ import type {
 } from './analytics.route';
 
 const getAnalyticsService = (c: Context<AppEnv>) =>
-	createAnalyticsService(createAnalyticsRepo(c.get('db')), c.env.AI);
+	createAnalyticsService({
+		analyticsRepo: createAnalyticsRepo(c.get('db')),
+		coursesRepo: createCoursesRepo(c.get('db')),
+		scholarshipProgramsRepo: createScholarshipProgramsRepo(c.get('db')),
+		programOfferingsRepo: createProgramOfferingsRepo(c.get('db')),
+		ai: c.env.AI,
+	});
 
 export const listAnalyticsMetrics: RouteHandler<
 	typeof listAnalyticsMetricsRoute,

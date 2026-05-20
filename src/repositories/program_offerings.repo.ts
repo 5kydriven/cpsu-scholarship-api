@@ -1,7 +1,11 @@
 import { Db } from '@/db';
-import { NewProgramOffering, programOfferings } from '@/db/schema';
+import {
+	NewProgramOffering,
+	programOfferings,
+	scholarshipPrograms,
+} from '@/db/schema';
 import { decodeCursor, encodeCursor } from '@/lib/pagination';
-import { and, asc, count, desc, eq, gt, ilike, lt, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, ilike, lt, or, sql } from 'drizzle-orm';
 
 export const createProgramOfferingsRepo = (db: Db) => ({
 	findById: (id: string) =>
@@ -11,6 +15,26 @@ export const createProgramOfferingsRepo = (db: Db) => ({
 			.where(eq(programOfferings.id, id))
 			.limit(1)
 			.then((r) => r[0] ?? null),
+
+	findByLabel: async (value: string) =>
+		await db
+			.select({ id: programOfferings.id })
+			.from(programOfferings)
+			.leftJoin(
+				scholarshipPrograms,
+				eq(programOfferings.scholarshipProgramId, scholarshipPrograms.id),
+			)
+			.where(
+				or(
+					ilike(programOfferings.schoolYear, value),
+					ilike(scholarshipPrograms.name, value),
+					ilike(
+						sql<string>`coalesce(${scholarshipPrograms.name} || ' ' || ${programOfferings.schoolYear}, ${programOfferings.schoolYear})`,
+						value,
+					),
+				),
+			)
+			.limit(2),
 
 	create: (data: NewProgramOffering) =>
 		db

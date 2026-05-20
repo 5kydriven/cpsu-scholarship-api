@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { after, before, beforeEach, test } from 'node:test';
 import { AppError } from '@/lib/errors';
 import type { AnalyticsRepo } from '@/repositories/analytics.repo';
+import type { CoursesRepo } from '@/repositories/courses.repo';
+import type { ProgramOfferingsRepo } from '@/repositories/program_offerings.repo';
+import type { ScholarshipProgramsRepo } from '@/repositories/scholarship_programs.repo';
 import { createAnalyticsService } from '../src/services/analytics.service';
+import type { AnalyticsServiceDependencies } from '../src/types/analytics';
 
 const originalConsoleLog = console.log;
 
@@ -56,8 +60,42 @@ beforeEach(() => {
 	repo = createRepo();
 });
 
+const createCoursesRepo = (
+	overrides: Partial<CoursesRepo> = {},
+) =>
+	({
+		findByNameOrAbbreviation: async () => [],
+		...overrides,
+	}) as CoursesRepo;
+
+const createScholarshipProgramsRepo = (
+	overrides: Partial<ScholarshipProgramsRepo> = {},
+) =>
+	({
+		findByName: async () => [],
+		...overrides,
+	}) as ScholarshipProgramsRepo;
+
+const createProgramOfferingsRepo = (
+	overrides: Partial<ProgramOfferingsRepo> = {},
+) =>
+	({
+		findByLabel: async () => [],
+		...overrides,
+	}) as ProgramOfferingsRepo;
+
+const createDeps = (
+	overrides: Partial<AnalyticsServiceDependencies> = {},
+): AnalyticsServiceDependencies => ({
+	analyticsRepo: repo,
+	coursesRepo: createCoursesRepo(),
+	scholarshipProgramsRepo: createScholarshipProgramsRepo(),
+	programOfferingsRepo: createProgramOfferingsRepo(),
+	...overrides,
+});
+
 test('lists supported analytics metrics', () => {
-	const service = createAnalyticsService(repo);
+	const service = createAnalyticsService(createDeps());
 	const response = service.listMetrics();
 
 	assert.ok(response.data.some((metric) => metric.id === 'total_students'));
@@ -77,7 +115,7 @@ test('runs scalar metric queries with filters', async () => {
 			return 12;
 		},
 	});
-	const service = createAnalyticsService(repo);
+	const service = createAnalyticsService(createDeps());
 
 	const response = await service.query({
 		metric: 'total_students',
@@ -92,7 +130,7 @@ test('runs scalar metric queries with filters', async () => {
 });
 
 test('rejects unsupported filters for a metric', async () => {
-	const service = createAnalyticsService(repo);
+	const service = createAnalyticsService(createDeps());
 
 	await assert.rejects(
 		() =>
@@ -108,7 +146,7 @@ test('rejects unsupported filters for a metric', async () => {
 });
 
 test('returns breakdown, series, and prediction result variants', async () => {
-	const service = createAnalyticsService(repo);
+	const service = createAnalyticsService(createDeps());
 
 	const breakdown = await service.query({ metric: 'applications_by_status' });
 	const series = await service.query({
@@ -126,7 +164,7 @@ test('returns breakdown, series, and prediction result variants', async () => {
 });
 
 test('routes chat locally when AI is not configured', async () => {
-	const service = createAnalyticsService(repo);
+	const service = createAnalyticsService(createDeps());
 
 	const response = await service.chat({
 		message: 'How many students are there?',
@@ -143,7 +181,7 @@ test('falls back when AI throws', async () => {
 			throw new Error('binding unavailable');
 		},
 	} as unknown as Ai;
-	const service = createAnalyticsService(repo, ai);
+	const service = createAnalyticsService(createDeps({ ai }));
 
 	const response = await service.chat({
 		message: 'How many pending applications do we have?',
@@ -157,7 +195,7 @@ test('falls back when AI returns malformed JSON', async () => {
 	const ai = {
 		run: async () => ({ response: '{not-json' }),
 	} as unknown as Ai;
-	const service = createAnalyticsService(repo, ai);
+	const service = createAnalyticsService(createDeps({ ai }));
 
 	const response = await service.chat({
 		message: 'Show applications by status',
@@ -168,7 +206,7 @@ test('falls back when AI returns malformed JSON', async () => {
 });
 
 test('returns unsupported chat response for unknown questions', async () => {
-	const service = createAnalyticsService(repo);
+	const service = createAnalyticsService(createDeps());
 
 	const response = await service.chat({
 		message: 'What is the weather today?',
@@ -177,4 +215,182 @@ test('returns unsupported chat response for unknown questions', async () => {
 	assert.equal(response.metric, null);
 	assert.equal(response.result, null);
 	assert.equal(response.unsupportedReason, 'unsupported_metric');
+});
+
+test('accepts optional chat history and generates a second AI response', async () => {
+	const calls: unknown[] = [];
+	const ai = {
+		run: async (_model: string, options: unknown) => {
+			calls.push(options);
+			if (calls.length === 1) {
+				return { response: JSON.stringify({ metric: 'total_students' }) };
+			}
+
+			return {
+				response:
+					'There are 10 students right now. Want me to break that down by course?',
+			};
+		},
+	} as unknown as Ai;
+	const service = createAnalyticsService(createDeps({ ai }));
+
+	const response = await service.chat({
+		message: 'What about now?',
+		history: [
+			{ role: 'user', content: 'How many students were there last year?' },
+			{ role: 'assistant', content: 'There were 8 students last year.' },
+		],
+	});
+
+	assert.equal(response.answer, 'There are 10 students right now. Want me to break that down by course?');
+	assert.equal(calls.length, 2);
+	const secondCall = calls[1] as {
+		messages: { role: string; content: string }[];
+	};
+	assert.ok(
+		secondCall.messages.some((message) =>
+			message.content.includes('How many students were there last year?'),
+		),
+	);
+	assert.match(
+		secondCall.messages.at(-1)?.content ?? '',
+		/\[Analytics data: Total students: 10 students\.\]/,
+	);
+});
+
+test('falls back to deterministic answer when response generation fails', async () => {
+	const ai = {
+		run: async (_model: string, options: { response_format?: unknown }) => {
+			if (options.response_format) {
+				return { response: JSON.stringify({ metric: 'total_students' }) };
+			}
+
+			throw new Error('response generation unavailable');
+		},
+	} as unknown as Ai;
+	const service = createAnalyticsService(createDeps({ ai }));
+
+	const response = await service.chat({
+		message: 'How many students are there?',
+	});
+
+	assert.equal(response.answer, 'Total students: 10 students.');
+});
+
+test('resolves classifier course names through the owning course repo', async () => {
+	const courseId = 'd4e5f6a7-b8c9-4123-9efa-456789012345';
+	let receivedCourseId: string | undefined;
+	let lookupValue: string | undefined;
+	repo = createRepo({
+		countStudents: async (filters) => {
+			receivedCourseId = filters?.courseId;
+			return 12;
+		},
+	});
+	const ai = {
+		run: async (_model: string, options: { response_format?: unknown }) => {
+			if (options.response_format) {
+				return {
+					response: JSON.stringify({
+						metric: 'total_students',
+						filters: { courseId: 'BSIT' },
+					}),
+				};
+			}
+
+			return { response: 'There are 12 BSIT students. Want a status breakdown?' };
+		},
+	} as unknown as Ai;
+	const service = createAnalyticsService(
+		createDeps({
+			ai,
+			coursesRepo: createCoursesRepo({
+				findByNameOrAbbreviation: async (value) => {
+					lookupValue = value;
+					return [{ id: courseId }];
+				},
+			}),
+		}),
+	);
+
+	const response = await service.chat({
+		message: 'How many students are in BSIT?',
+	});
+
+	assert.equal(lookupValue, 'BSIT');
+	assert.equal(receivedCourseId, courseId);
+	assert.equal(response.metric, 'total_students');
+});
+
+test('returns ambiguous unsupported response for ambiguous name filters', async () => {
+	const ai = {
+		run: async (_model: string, options: { response_format?: unknown }) => {
+			if (options.response_format) {
+				return {
+					response: JSON.stringify({
+						metric: 'total_students',
+						filters: { courseId: 'Engineering' },
+					}),
+				};
+			}
+
+			return {
+				response:
+					'I found more than one matching course. Try naming the exact course or abbreviation.',
+			};
+		},
+	} as unknown as Ai;
+	const service = createAnalyticsService(
+		createDeps({
+			ai,
+			coursesRepo: createCoursesRepo({
+				findByNameOrAbbreviation: async () => [
+					{ id: 'd4e5f6a7-b8c9-4123-9efa-456789012345' },
+					{ id: 'e4e5f6a7-b8c9-4123-9efa-456789012345' },
+				],
+			}),
+		}),
+	);
+
+	const response = await service.chat({
+		message: 'How many students are in Engineering?',
+	});
+
+	assert.equal(response.metric, null);
+	assert.equal(response.unsupportedReason, 'ambiguous');
+});
+
+test('returns missing-filter unsupported response for unresolved name filters', async () => {
+	const ai = {
+		run: async (_model: string, options: { response_format?: unknown }) => {
+			if (options.response_format) {
+				return {
+					response: JSON.stringify({
+						metric: 'total_students',
+						filters: { courseId: 'Unknown Course' },
+					}),
+				};
+			}
+
+			return {
+				response:
+					'I could not match that course yet. Want to try the exact abbreviation?',
+			};
+		},
+	} as unknown as Ai;
+	const service = createAnalyticsService(
+		createDeps({
+			ai,
+			coursesRepo: createCoursesRepo({
+				findByNameOrAbbreviation: async () => [],
+			}),
+		}),
+	);
+
+	const response = await service.chat({
+		message: 'How many students are in Unknown Course?',
+	});
+
+	assert.equal(response.metric, null);
+	assert.equal(response.unsupportedReason, 'missing_filter');
 });

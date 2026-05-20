@@ -13,6 +13,13 @@ export const createScholarshipProgramsRepo = (db: Db) => ({
 			.limit(1)
 			.then((r) => r[0] ?? null),
 
+	findByName: async (value: string) =>
+		await db
+			.select({ id: scholarshipPrograms.id })
+			.from(scholarshipPrograms)
+			.where(ilike(scholarshipPrograms.name, value))
+			.limit(2),
+
 	create: (data: NewScholarshipProgram) =>
 		db
 			.insert(scholarshipPrograms)
