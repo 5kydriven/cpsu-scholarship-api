@@ -1,7 +1,4 @@
-import type {
-	EligibilityCriteriaSnapshot,
-	NewEligibilitySuggestion,
-} from '@/db/schema';
+import type { EligibilityCriteriaSnapshot } from '@/db/schema';
 import { Errors } from '@/lib/errors';
 import type { ApplicationsRepo } from '@/repositories/applications';
 import type {
@@ -80,34 +77,30 @@ export const createEligibilitySuggestionsService = (
 			.sort(compareEligibleApplications);
 
 		const generatedAt = new Date().toISOString();
-		const run = await eligibilitySuggestionsRepo
-			.createRun({
-				offeringId,
-				generatedBy: generatedByUser.id,
+		const suggestionPayloads = rankedApplications.map((application, index) => ({
+			applicationId: application.application.id,
+			rank: index + 1,
+			gwa: application.gwa.toFixed(2),
+			annualFamilyIncome: application.annualFamilyIncome.toFixed(2),
+			priorityProofs: application.priorityProofs,
+		}));
+
+		const { run, updatedApplications } = await eligibilitySuggestionsRepo
+			.createRunWithSuggestionsAndMarkApplications(
+				{
+					offeringId,
+					generatedBy: generatedByUser.id,
+					generatedAt,
+					criteriaSnapshot,
+					suggestedCount: rankedApplications.length,
+				},
+				suggestionPayloads,
+				rankedApplications.map(({ application }) => application.id),
 				generatedAt,
-				criteriaSnapshot,
-				suggestedCount: rankedApplications.length,
-			})
+			)
 			.catch((error) => {
 				throw toCreateRunError(error);
 			});
-
-		const suggestionPayloads = rankedApplications.map(
-			(application, index): NewEligibilitySuggestion => ({
-				runId: run.id,
-				applicationId: application.application.id,
-				rank: index + 1,
-				gwa: application.gwa.toFixed(2),
-				annualFamilyIncome: application.annualFamilyIncome.toFixed(2),
-				priorityProofs: application.priorityProofs,
-			}),
-		);
-
-		await eligibilitySuggestionsRepo.createSuggestions(suggestionPayloads);
-		const updatedApplications = await applicationsRepo.markManyUnderReview(
-			rankedApplications.map(({ application }) => application.id),
-			generatedAt,
-		);
 		const orderedApplications = orderApplicationsByIds(
 			updatedApplications,
 			rankedApplications.map(({ application }) => application.id),

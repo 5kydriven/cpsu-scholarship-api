@@ -11,6 +11,7 @@
 		"docker:clean": "docker-compose down -v",
 		"docker:seed": "docker exec -i starter-template-hono-postgres psql -U postgres -d starter_template_hono < ./src/db/seeds/create_admin.sql",
 		"neon:seed": "psql \"$DATABASE_URL\" -f ./src/db/seeds/create_admin.sql",
+		"test": "tsx --test test/**/*.test.ts",
 		"db:generate": "bun drizzle-kit generate",
 		"db:migrate": "bun drizzle-kit migrate",
 		"db:migrate:staging": "dotenv -e .env.staging -- drizzle-kit migrate",
