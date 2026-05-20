@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { Scalar } from '@scalar/hono-api-reference';
 import { dbMiddleware } from '@/middleware/db';
 import { cors } from 'hono/cors';
+import { getCorsOrigin } from '@/lib/cors-origins';
 import { withAuth } from '@/middleware/with-auth';
 import { authRoute } from '@/modules/auth/auth.route';
 import { coursesRoute } from '@/modules/courses/courses.route';
@@ -27,12 +28,7 @@ app.use(
 	'*',
 	cors({
 		origin: (origin, c) => {
-			const allowedOrigin = c.env.CORS_ORIGIN;
-
-			if (!origin) return allowedOrigin;
-			if (origin === allowedOrigin) return origin;
-
-			return allowedOrigin;
+			return getCorsOrigin(c.env.CORS_ORIGIN, origin);
 		},
 		allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 		allowHeaders: ['Content-Type', 'Authorization'],
