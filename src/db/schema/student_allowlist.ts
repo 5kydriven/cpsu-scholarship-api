@@ -1,5 +1,7 @@
+import { sql } from 'drizzle-orm';
 import {
 	boolean,
+	index,
 	pgTable,
 	text,
 	timestamp,
@@ -34,6 +36,9 @@ export const studentAllowlist = pgTable(
 		uniqueIndex('student_allowlist_registered_user_id_unique').on(
 			table.registeredUserId,
 		),
+		index('idx_student_allowlist_is_registered_true')
+			.on(table.id)
+			.where(sql`${table.isRegistered} = true`),
 	],
 );
 

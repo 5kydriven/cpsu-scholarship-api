@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { parseCorsOrigins } from './cors-origins';
 import type { Db } from '../db';
 import { account, session, user, verification } from '../db/schema/auth';
 import { hashPassword, verifyPassword } from '../utils/crypto';
@@ -40,7 +41,7 @@ export const createAuth = (db: Db, env: CloudflareBindings) => {
 			},
 		},
 
-		trustedOrigins: [env.CORS_ORIGIN],
+		trustedOrigins: parseCorsOrigins(env.CORS_ORIGIN),
 	});
 };
 

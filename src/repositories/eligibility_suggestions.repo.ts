@@ -1,11 +1,12 @@
 import type { Db } from '@/db';
 import {
+	applications,
 	eligibilitySuggestionRuns,
 	eligibilitySuggestions,
 	type NewEligibilitySuggestion,
 	type NewEligibilitySuggestionRun,
 } from '@/db/schema';
-import { and, asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 
 const suggestionApplicationWithRelations = {
 	addresses: true,
@@ -56,20 +57,48 @@ export const createEligibilitySuggestionsRepo = (db: Db) => ({
 			})
 			.then((r) => r ?? null),
 
-	createRun: (data: NewEligibilitySuggestionRun) =>
-		db
-			.insert(eligibilitySuggestionRuns)
-			.values(data)
-			.returning()
-			.then((r) => r[0]),
+	createRunWithSuggestionsAndMarkApplications: async (
+		runData: NewEligibilitySuggestionRun,
+		suggestionsData: Omit<NewEligibilitySuggestion, 'runId'>[],
+		applicationIds: string[],
+		reviewedAt: string,
+	) =>
+		db.transaction(async (tx) => {
+			const run = await tx
+				.insert(eligibilitySuggestionRuns)
+				.values(runData)
+				.returning()
+				.then((r) => r[0]);
 
-	createSuggestions: (data: NewEligibilitySuggestion[]) =>
-		data.length === 0
-			? Promise.resolve([])
-			: db
-					.insert(eligibilitySuggestions)
-					.values(data)
-					.returning(),
+			if (suggestionsData.length > 0) {
+				await tx.insert(eligibilitySuggestions).values(
+					suggestionsData.map((suggestion) => ({
+						...suggestion,
+						runId: run.id,
+					})),
+				);
+			}
+
+			if (applicationIds.length > 0) {
+				await tx
+					.update(applications)
+					.set({
+						status: 'under_review',
+						updatedAt: reviewedAt,
+					})
+					.where(inArray(applications.id, applicationIds));
+			}
+
+			const updatedApplications =
+				applicationIds.length === 0
+					? []
+					: await tx.query.applications.findMany({
+							where: inArray(applications.id, applicationIds),
+							with: suggestionApplicationWithRelations,
+						});
+
+			return { run, updatedApplications };
+		}),
 });
 
 export type EligibilitySuggestionsRepo = ReturnType<

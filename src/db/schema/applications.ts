@@ -81,6 +81,22 @@ export const applications = pgTable(
 		index('idx_applications_offering_id').on(table.offeringId),
 		index('idx_applications_course_id').on(table.courseId),
 		index('idx_applications_status').on(table.status),
+		index('idx_applications_status_offering_id').on(
+			table.status,
+			table.offeringId,
+		),
+		index('idx_applications_status_course_id').on(
+			table.status,
+			table.courseId,
+		),
+		index('idx_applications_offering_created_at').on(
+			table.offeringId,
+			table.createdAt,
+		),
+		index('idx_applications_status_reviewed_at').on(
+			table.status,
+			table.reviewedAt,
+		),
 	],
 );
 

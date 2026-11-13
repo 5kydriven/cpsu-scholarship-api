@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
 	boolean,
 	index,
@@ -41,6 +41,9 @@ export const student = pgTable(
 	(table) => [
 		index('idx_students_email').on(table.email),
 		index('idx_students_course_id').on(table.courseId),
+		index('idx_students_is_scholar_true')
+			.on(table.id)
+			.where(sql`${table.isScholar} = true`),
 	],
 );
 

@@ -1,7 +1,9 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { Scalar } from '@scalar/hono-api-reference';
-import { dbMiddleware } from '@/middleware/db';
 import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
+import { getCorsOrigin } from '@/lib/cors-origins';
+import { dbMiddleware } from '@/middleware/db';
 import { withAuth } from '@/middleware/with-auth';
 import { authRoute } from '@/modules/auth/auth.route';
 import { coursesRoute } from '@/modules/courses/courses.route';
@@ -9,7 +11,6 @@ import { errorHandler } from '@/middleware/error-handler';
 import { staffProfilesRoute } from '@/modules/staff_profiles/staff_profiles.route';
 import { studentAllowlistsRoute } from '@/modules/student_allowlists/student_allowlists.route';
 import type { AppEnv } from '@/types/app';
-import { logger } from 'hono/logger';
 import { programOfferingsRoute } from './modules/program_offerings/program_offerings.route';
 import { scholarshipProgramsRoute } from './modules/scholarship_programs/scholarship_programs.route';
 import { parentsRoute } from './modules/parents/parents.route';
@@ -17,6 +18,7 @@ import { addressesRoute } from './modules/addresses/addresses.route';
 import { applicationsRoute } from './modules/applications/applications.route';
 import { filesRoute } from './modules/files/files.route';
 import { payoutsRoute } from './modules/payouts/payouts.route';
+import { analyticsRoute } from './modules/analytics/analytics.route';
 
 const app = new OpenAPIHono<AppEnv>();
 
@@ -26,12 +28,7 @@ app.use(
 	'*',
 	cors({
 		origin: (origin, c) => {
-			const allowedOrigin = c.env.CORS_ORIGIN;
-
-			if (!origin) return allowedOrigin;
-			if (origin === allowedOrigin) return origin;
-
-			return allowedOrigin;
+			return getCorsOrigin(c.env.CORS_ORIGIN, origin);
 		},
 		allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 		allowHeaders: ['Content-Type', 'Authorization'],
@@ -80,5 +77,6 @@ app.route('/api/v1/payouts', payoutsRoute);
 app.route('/api/v1/parents', parentsRoute);
 app.route('/api/v1/addresses', addressesRoute);
 app.route('/api/v1/files', filesRoute);
+app.route('/api/v1/analytics', analyticsRoute);
 
 export default app;

@@ -9,6 +9,7 @@ export type AppBindings = {
 	CORS_ORIGIN: string;
 	R2: R2Bucket;
 	PUBLIC_URL: string;
+	AI?: Ai;
 };
 
 export type AppVariables = {
