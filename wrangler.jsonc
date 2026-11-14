@@ -50,13 +50,13 @@
 			],
 		},
 		"production": {
-			"name": "cpsu-scholarship-api",
+			"name": "cpsu-scholarship-api-staging",
 			"ai": {
 				"binding": "AI",
 			},
 			"vars": {
 				"APP_ENV": "production",
-				"BETTER_AUTH_URL": "https://cpsu-scholarship-api.tagpuno619.workers.dev",
+				"BETTER_AUTH_URL": "https://cpsu-scholarship-api-staging.tagpuno619.workers.dev",
 				"PUBLIC_URL": "https://pub-ae01ff6cf3d140e08992f30178f9b70a.r2.dev",
 				"CORS_ORIGIN": "http://localhost:3000,https://cpsu-scholarship-nuxt.vercel.app",
 			},
