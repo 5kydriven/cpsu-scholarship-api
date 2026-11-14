@@ -14,6 +14,14 @@ Route work for CPSU Scholarship API. Do not implement production code, approve r
    `python3 .agents/scripts/manage-state.py --action=init --task=<TASK_ID> --complexity=<SMALL|MEDIUM|LARGE>`
 3. Require Gate 0 scope approval before implementation.
 
+## Workflow selection
+Before creating task artifacts or initializing implementation work, ask the user which workflow to use:
+
+- **FEATURE WORKFLOW** — `.agents/workflows/multiple-agent-workflow.md`
+- **HOTFIX WORKFLOW** — `.agents/workflows/hotfix-workflow.md`
+
+Recommend the workflow that best fits the request based on scope, urgency, regression risk, and review depth, with a brief reason. The recommendation is advisory; do not choose for the user. Pause until the user selects a workflow, then record it in the task packet and `STATE.json`.
+
 ## Complexity routing
 - SMALL: context builder → implementation → targeted QA → user final verdict.
 - MEDIUM: context builder → architect → implementation → code review → QA → user final verdict.

@@ -119,6 +119,17 @@ MASTER AGENT INITIALIZATION
 
 ---
 
+# 2A. DEVELOPMENT WORKFLOW SELECTION (MANDATORY)
+
+When the user asks to implement a feature or fix, ask which workflow to use before creating task artifacts or modifying production code:
+
+- **FEATURE WORKFLOW** → `.agents/workflows/multiple-agent-workflow.md`
+- **HOTFIX WORKFLOW** → `.agents/workflows/hotfix-workflow.md`
+
+Recommend the workflow that best fits the request based on scope, urgency, regression risk, and required review depth, with a brief reason. The recommendation is advisory; do not infer or select the workflow on the user's behalf. Pause until the user selects one, then record the selection in the task packet and `STATE.json`.
+
+---
+
 # 3. BOOTSTRAP MODE RULES
 
 ```
