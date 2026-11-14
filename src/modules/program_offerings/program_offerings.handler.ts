@@ -36,7 +36,7 @@ export const listProgramOfferings: RouteHandler<
 > = async (c) => {
 	const { page, perPage, search, sort, order } = c.req.valid('query');
 	const service = getProgramOfferingsService(c);
-	const { rows, total } = await service.listOffset({
+	const { rows, total } = await service.listPublicOffset({
 		page,
 		perPage,
 		search,
@@ -57,7 +57,7 @@ export const listProgramOfferingsCursor: RouteHandler<
 	const { cursor, perPage, direction } = c.req.valid('query');
 	const service = getProgramOfferingsService(c);
 	const { rows, nextCursor, prevCursor, hasNext, hasPrev } =
-		await service.listCursor({
+		await service.listPublicCursor({
 			cursor: cursor ?? null,
 			perPage,
 			direction,
@@ -81,7 +81,7 @@ export const getProgramOffering: RouteHandler<
 > = async (c) => {
 	const { id } = c.req.valid('param');
 	const service = getProgramOfferingsService(c);
-	const programOffering = await service.getById(id);
+	const programOffering = await service.getPublicById(id);
 
 	return c.json(programOffering, 200);
 };

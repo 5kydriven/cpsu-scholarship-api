@@ -8,11 +8,19 @@ import { decodeCursor, encodeCursor } from '@/lib/pagination';
 import { and, asc, count, desc, eq, gt, ilike, lt, or, sql } from 'drizzle-orm';
 
 export const createProgramOfferingsRepo = (db: Db) => ({
-	findById: (id: string) =>
+	findById: (id: string, activeOnly = false) =>
 		db
 			.select()
 			.from(programOfferings)
-			.where(eq(programOfferings.id, id))
+			.where(
+				activeOnly
+					? and(
+							eq(programOfferings.id, id),
+							eq(programOfferings.isActive, true),
+							eq(programOfferings.isArchived, false),
+						)
+					: eq(programOfferings.id, id),
+			)
 			.limit(1)
 			.then((r) => r[0] ?? null),
 
@@ -65,6 +73,7 @@ export const createProgramOfferingsRepo = (db: Db) => ({
 		search?: string;
 		sortField?: 'schoolYear' | 'createdAt';
 		sortOrder?: 'asc' | 'desc';
+		activeOnly?: boolean;
 	}) => {
 		const {
 			page,
@@ -72,12 +81,18 @@ export const createProgramOfferingsRepo = (db: Db) => ({
 			search,
 			sortField = 'createdAt',
 			sortOrder = 'desc',
+			activeOnly = false,
 		} = opts;
 		const offset = (page - 1) * perPage;
 
-		const conditions = [];
+		const conditions = activeOnly
+			? [
+					eq(programOfferings.isActive, true),
+					eq(programOfferings.isArchived, false),
+				]
+			: [];
 		if (search) {
-			conditions.push(or(ilike(programOfferings.schoolYear, `%${search}%`)));
+			conditions.push(ilike(programOfferings.schoolYear, `%${search}%`));
 		}
 
 		const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -104,15 +119,28 @@ export const createProgramOfferingsRepo = (db: Db) => ({
 		cursor: string | null;
 		perPage: number;
 		direction: 'next' | 'prev';
+		activeOnly?: boolean;
 	}) => {
-		const { cursor, perPage, direction } = opts;
+		const { cursor, perPage, direction, activeOnly = false } = opts;
 		const decodedCursor = decodeCursor(cursor);
 
-		const where = decodedCursor?.id
+		const cursorCondition = decodedCursor?.id
 			? direction === 'next'
 				? gt(programOfferings.id, decodedCursor.id)
 				: lt(programOfferings.id, decodedCursor.id)
 			: undefined;
+		const where = activeOnly
+			? cursorCondition
+				? and(
+						cursorCondition,
+						eq(programOfferings.isActive, true),
+						eq(programOfferings.isArchived, false),
+					)
+				: and(
+						eq(programOfferings.isActive, true),
+						eq(programOfferings.isArchived, false),
+					)
+			: cursorCondition;
 
 		const rows = await db
 			.select()

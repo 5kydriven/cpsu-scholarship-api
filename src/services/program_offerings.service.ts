@@ -11,6 +11,12 @@ export const createProgramOfferingsService = (
 		return programOffering;
 	},
 
+	async getPublicById(id: string) {
+		const programOffering = await programOfferingsRepo.findById(id, true);
+		if (!programOffering) throw Errors.notFound('Program Offering not found');
+		return programOffering;
+	},
+
 	async softDelete(id: string) {
 		const existing = await programOfferingsRepo.findById(id);
 		if (!existing) throw Errors.notFound('Program Offering not found');
@@ -71,12 +77,30 @@ export const createProgramOfferingsService = (
 		return programOfferingsRepo.findManyOffset(opts);
 	},
 
+	async listPublicOffset(opts: {
+		page: number;
+		perPage: number;
+		search?: string;
+		sortField?: 'schoolYear' | 'createdAt';
+		sortOrder?: 'asc' | 'desc';
+	}) {
+		return programOfferingsRepo.findManyOffset({ ...opts, activeOnly: true });
+	},
+
 	async listCursor(opts: {
 		cursor: string | null;
 		perPage: number;
 		direction: 'next' | 'prev';
 	}) {
 		return programOfferingsRepo.findManyCursor(opts);
+	},
+
+	async listPublicCursor(opts: {
+		cursor: string | null;
+		perPage: number;
+		direction: 'next' | 'prev';
+	}) {
+		return programOfferingsRepo.findManyCursor({ ...opts, activeOnly: true });
 	},
 });
 
