@@ -35,9 +35,11 @@ export const createApplicationsService = (
 		addresses: Omit<NewAddress, 'applicationId'>[],
 	) {
 		const applicationPayload = { ...application };
-		const app = await applicationsRepo.create(applicationPayload).catch((error) => {
-			throw toCreateApplicationError(error);
-		});
+		const app = await applicationsRepo
+			.create(applicationPayload)
+			.catch((error) => {
+				throw toCreateApplicationError(error);
+			});
 
 		try {
 			const parentPayloads = parents.map((p) => ({
@@ -133,9 +135,7 @@ export const createApplicationsService = (
 		const finalApplications = orderApplicationsByIds(
 			applications,
 			uniqueIds,
-		).filter((application) =>
-			finalApplicationStatuses.has(application.status),
-		);
+		).filter((application) => finalApplicationStatuses.has(application.status));
 
 		if (finalApplications.length > 0) {
 			throw Errors.conflict(
@@ -193,7 +193,9 @@ export const createApplicationsService = (
 		}
 
 		if (result.type === 'final') {
-			throw Errors.conflict(`Application is already ${result.application.status}`);
+			throw Errors.conflict(
+				`Application is already ${result.application.status}`,
+			);
 		}
 
 		if (!result.application) {

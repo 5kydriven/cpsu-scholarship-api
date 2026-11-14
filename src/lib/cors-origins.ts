@@ -6,10 +6,8 @@ export const parseCorsOrigins = (value: string) =>
 
 export const getCorsOrigin = (value: string, requestOrigin?: string) => {
 	const allowedOrigins = parseCorsOrigins(value);
-	const fallbackOrigin = allowedOrigins[0] ?? '';
 
-	if (!requestOrigin) return fallbackOrigin;
-	if (allowedOrigins.includes(requestOrigin)) return requestOrigin;
+	if (!requestOrigin) return '';
 
-	return fallbackOrigin;
+	return allowedOrigins.includes(requestOrigin) ? requestOrigin : '';
 };
