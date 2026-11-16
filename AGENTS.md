@@ -71,6 +71,8 @@ This repository is a Cloudflare Worker API for the CPSU scholarship domain, orga
 
 - Respond in the user's preferred language; if unspecified, use English and keep technical terms in English.
 - Do not modify or translate fenced code blocks in user-provided content.
+- Before implementing any feature or fix, recommend the best workflow based on urgency, scope, coupling, and parallelism, then ask the user to choose one: `hotfix`, `multiple agents`, or `direct change`. Do not begin implementation until the user chooses or explicitly authorizes the assistant to choose.
+- Use `hotfix` for urgent, narrow production fixes; use `multiple agents` for broad or parallelizable work; use `direct change` for focused work best handled in one working context.
 - Ask before introducing new tests, lint rules, formatter setup, external dependencies, or broad architecture changes.
 - Before editing, review related route wiring, handlers, services, repositories, schemas, context variables, and generated/config boundaries.
 - Solve the user's request with the smallest focused change that fits the current codebase; report meaningful side effects or mismatches found during analysis.
