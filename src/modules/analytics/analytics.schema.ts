@@ -190,7 +190,9 @@ export const AnalyticsChatRequestSchema = z
 			.trim()
 			.min(1)
 			.max(1000)
-			.openapi({ example: 'How many students are there as of now?' }),
+			.openapi({
+				example: 'What is the latest eligibility prediction for scholars?',
+			}),
 		history: z
 			.object({
 				role: z.enum(['user', 'assistant']).openapi({ example: 'user' }),
