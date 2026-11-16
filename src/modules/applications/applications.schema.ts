@@ -73,6 +73,13 @@ const applicationSchemaExamples = {
 		schema.openapi({ example: 'applications/a1b2c3/ip-certificate.pdf' }),
 	fourPsUrl: (schema: any) =>
 		schema.openapi({ example: 'applications/a1b2c3/fourps-certificate.pdf' }),
+	documentUrl: (schema: any) =>
+		schema.openapi({
+			example: [
+				'applications/a1b2c3/document-1.pdf',
+				'applications/a1b2c3/document-2.pdf',
+			],
+		}),
 	yearLevelAtApproval: (schema: any) =>
 		schema.openapi({ example: '3' }),
 	expectedGraduationSy: (schema: any) =>
@@ -143,6 +150,17 @@ export const applicationInsertSchema = createInsertSchema(
 	})
 	.extend({
 		yearLevel: z.enum(APPLICATION_YEAR_LEVELS).openapi({ example: '2' }),
+		documentUrl: z
+			.string()
+			.array()
+			.optional()
+			.nullable()
+			.openapi({
+				example: [
+					'applications/a1b2c3/document-1.pdf',
+					'applications/a1b2c3/document-2.pdf',
+				],
+			}),
 		addresses: applicationAddressInputSchema.array().min(1).max(2).openapi({
 			description:
 				'At least one and at most two address records are required for the application',
