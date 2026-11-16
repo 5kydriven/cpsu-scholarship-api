@@ -1,25 +1,30 @@
+import {
+	isApplicationYearLevel,
+	type ApplicationYearLevel,
+} from '@/constants/year-level';
 import { Errors } from '@/lib/errors';
 
-const graduationOffsets: Record<string, number> = {
-	'1st Year': 3,
-	'2nd Year': 2,
-	'3rd Year': 1,
-	'4th Year': 0,
+const graduationOffsets: Record<ApplicationYearLevel, number> = {
+	'1': 3,
+	'2': 2,
+	'3': 1,
+	'4': 0,
 };
 
 export const computeGraduationSchoolYear = (
 	yearLevel: string,
 	schoolYear: string,
 ) => {
-	const offset = graduationOffsets[yearLevel];
-	if (offset === undefined) {
+	if (!isApplicationYearLevel(yearLevel)) {
 		throw Errors.validation([
 			{
 				field: 'yearLevel',
-				message: 'Year level must be one of 1st Year, 2nd Year, 3rd Year, or 4th Year',
+				message: 'Year level must be a string containing 1, 2, 3, or 4',
 			},
 		]);
 	}
+
+	const offset = graduationOffsets[yearLevel];
 
 	const match = schoolYear.match(/^(\d{4})\s*-\s*(\d{4})$/);
 	if (!match) {
