@@ -1,4 +1,5 @@
 import z from 'zod';
+import { APPLICATION_YEAR_LEVELS } from '@/constants/year-level';
 import { applications } from '@/db/schema';
 import { courseSelectSchema } from '../courses/courses.schema';
 import {
@@ -50,7 +51,7 @@ const applicationSchemaExamples = {
 	extName: (schema: any) => schema.openapi({ example: 'Jr.' }),
 	gender: (schema: any) => schema.openapi({ example: 'female' }),
 	birthdate: (schema: any) => schema.openapi({ example: '2005-08-14' }),
-	yearLevel: (schema: any) => schema.openapi({ example: '2nd Year' }),
+	yearLevel: (schema: any) => schema.openapi({ example: '2' }),
 	gwa: (schema: any) => schema.openapi({ example: '1.75' }),
 	citizenship: (schema: any) => schema.openapi({ example: 'Filipino' }),
 	birthplace: (schema: any) => schema.openapi({ example: 'San Carlos City' }),
@@ -73,7 +74,7 @@ const applicationSchemaExamples = {
 	fourPsUrl: (schema: any) =>
 		schema.openapi({ example: 'applications/a1b2c3/fourps-certificate.pdf' }),
 	yearLevelAtApproval: (schema: any) =>
-		schema.openapi({ example: '3rd Year' }),
+		schema.openapi({ example: '3' }),
 	expectedGraduationSy: (schema: any) =>
 		schema.openapi({ example: '2025-2026' }),
 	maxPayoutSy: (schema: any) => schema.openapi({ example: '2025-2026' }),
@@ -141,6 +142,7 @@ export const applicationInsertSchema = createInsertSchema(
 		maxPayoutSy: true,
 	})
 	.extend({
+		yearLevel: z.enum(APPLICATION_YEAR_LEVELS).openapi({ example: '2' }),
 		addresses: applicationAddressInputSchema.array().min(1).max(2).openapi({
 			description:
 				'At least one and at most two address records are required for the application',
