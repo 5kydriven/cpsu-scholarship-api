@@ -54,6 +54,7 @@ export const applications = pgTable(
 		pwdUrl: text('pwd_url'),
 		ipUrl: text('ip_url'),
 		fourPsUrl: text('fourps_url'),
+		documentUrl: text('document_url').array(),
 		status: applicationStatusEnum('status').default('pending').notNull(),
 		reviewedBy: text('reviewed_by').references(() => user.id),
 		reviewedAt: timestamp('reviewed_at', {

@@ -183,6 +183,13 @@
       "when": 1779241669733,
       "tag": "0025_concerned_clint_barton",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794843235957,
+      "tag": "0026_lively_magneto",
+      "breakpoints": true
     }
   ]
 }
