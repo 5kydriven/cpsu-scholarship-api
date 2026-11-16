@@ -19,14 +19,16 @@ Before creating task artifacts or initializing implementation work, ask the user
 
 - **FEATURE WORKFLOW** — `.agents/workflows/multiple-agent-workflow.md`
 - **HOTFIX WORKFLOW** — `.agents/workflows/hotfix-workflow.md`
+- **DIRECT CHANGE WORKFLOW** — `.agents/workflows/direct-change-workflow.md`
 
-Recommend the workflow that best fits the request based on scope, urgency, regression risk, and review depth, with a brief reason. The recommendation is advisory; do not choose for the user. Pause until the user selects a workflow, then record it in the task packet and `STATE.json`.
+Recommend the workflow that best fits the request based on scope, urgency, regression risk, coupling, and parallelism, with a brief reason. The recommendation is advisory; do not choose for the user. Pause until the user selects a workflow, then record it in the task packet and `STATE.json`.
 
 ## Complexity routing
 - SMALL: context builder → implementation → targeted QA → user final verdict.
 - MEDIUM: context builder → architect → implementation → code review → QA → user final verdict.
 - LARGE: full six-agent pipeline, including all architecture/security and release gates.
 - Hotfixes use `.agents/workflows/hotfix-workflow.md`.
+- Direct changes use `.agents/workflows/direct-change-workflow.md` and stay in one implementation context unless the user changes the selection.
 
 ## State and gates
 Use `.agent-work/<TASK_ID>/STATE.json` and the deterministic validators. Cap review remediation at three cycles; escalate the fourth failure to the user. Only the user can approve scope, architecture, and final release.

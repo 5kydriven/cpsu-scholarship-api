@@ -14,7 +14,7 @@
 - Modular memory router, conventions, five domain chunks, service catalog, schema catalog, slim memory index, and archive.
 - Context policy and lean global guardrails.
 - Orchestrator plus six worker agents: context builder, architect, implementation engineer, code reviewer, QA validator, release manager.
-- Feature and hotfix workflows with SMALL/MEDIUM/LARGE routing and human gates.
+- Direct-change, feature, and hotfix workflows with explicit user selection, complexity routing, and human gates.
 - Deterministic Python/PHP artifact and state scripts; Python catalog sync is canonical for this TypeScript repository.
 - On-demand QA and agentic workflow optimization skills.
 - Developer quick-start guide at `.agents/README.md`.

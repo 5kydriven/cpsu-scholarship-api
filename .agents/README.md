@@ -6,7 +6,7 @@ Start here:
 
 1. Read `.agents/memory/INDEX.md` and `.agents/CONTEXT_POLICY.md`.
 2. Route new work through `.agents/agents/orchestrator/agent.md`.
-3. Use `.agents/workflows/multiple-agent-workflow.md` for features and `.agents/workflows/hotfix-workflow.md` for urgent fixes.
+3. After the user selects a workflow, use `.agents/workflows/direct-change-workflow.md` for focused changes, `.agents/workflows/multiple-agent-workflow.md` for broad or parallelizable features, or `.agents/workflows/hotfix-workflow.md` for urgent fixes.
 4. Store task artifacts under `.agent-work/<TASK_ID>/`.
 5. Run `python3 .agents/scripts/manage-state.py --action=init --task=feat/<slug> --complexity=MEDIUM`.
 6. Run `python3 .agents/scripts/validate-artifact.py` at each handoff gate.

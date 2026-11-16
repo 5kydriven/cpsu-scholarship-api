@@ -125,8 +125,9 @@ When the user asks to implement a feature or fix, ask which workflow to use befo
 
 - **FEATURE WORKFLOW** → `.agents/workflows/multiple-agent-workflow.md`
 - **HOTFIX WORKFLOW** → `.agents/workflows/hotfix-workflow.md`
+- **DIRECT CHANGE WORKFLOW** → `.agents/workflows/direct-change-workflow.md`
 
-Recommend the workflow that best fits the request based on scope, urgency, regression risk, and required review depth, with a brief reason. The recommendation is advisory; do not infer or select the workflow on the user's behalf. Pause until the user selects one, then record the selection in the task packet and `STATE.json`.
+Recommend the workflow that best fits the request based on scope, urgency, regression risk, coupling, and parallelism, with a brief reason. The recommendation is advisory; do not infer or select the workflow on the user's behalf. Pause until the user selects one, then record the selection in the task packet and `STATE.json`.
 
 ---
 
@@ -177,7 +178,8 @@ It compiles from golden boilerplate templates in `.agents/master-templates/`:
 │   └── release-manager.template.md            -> .agents/agents/release-manager/agent.md
 ├── workflows/
 │   ├── multiple-agent-workflow.template.md    -> .agents/workflows/multiple-agent-workflow.md
-│   └── hotfix-workflow.template.md            -> .agents/workflows/hotfix-workflow.md
+│   ├── hotfix-workflow.template.md            -> .agents/workflows/hotfix-workflow.md
+│   └── direct-change-workflow.template.md     -> .agents/workflows/direct-change-workflow.md
 ├── rules/
 │   └── codebase-standards.template.md         -> .agents/rules/codebase-standards.md (Lean Guardrails)
 ├── scripts/
