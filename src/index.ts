@@ -61,6 +61,8 @@ app.get(
 );
 
 app.use('*', logger());
+app.get('/healthz', (c) => c.text('ok'));
+
 app.use('*', dbMiddleware());
 
 app.use('*', withAuth);

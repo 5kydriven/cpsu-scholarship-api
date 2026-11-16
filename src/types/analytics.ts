@@ -9,6 +9,7 @@ import type {
 	AnalyticsTimeBucket,
 } from '@/modules/analytics/analytics.schema';
 import type { AnalyticsRepo } from '@/repositories/analytics.repo';
+import type { AppBindings } from './app';
 import type { CoursesRepo } from '@/repositories/courses.repo';
 import type { ProgramOfferingsRepo } from '@/repositories/program_offerings.repo';
 import type { ScholarshipProgramsRepo } from '@/repositories/scholarship_programs.repo';
@@ -69,7 +70,7 @@ export type AnalyticsServiceDependencies = {
 	coursesRepo: CoursesRepo;
 	scholarshipProgramsRepo: ScholarshipProgramsRepo;
 	programOfferingsRepo: ProgramOfferingsRepo;
-	ai?: Ai;
+	ai?: AppBindings['AI'];
 };
 
 export type AnalyticsAiMessage = {

@@ -3,6 +3,7 @@ import type {
 	AnalyticsClassification,
 	AnalyticsClassificationResult,
 } from '@/types/analytics';
+import type { AppBindings } from '@/types/app';
 import {
 	buildClassifierMessages,
 	buildResponseMessages,
@@ -15,7 +16,7 @@ import { classifyMetricLocally } from '@/utils/analytics-classifier';
 import { ANALYTICS_AI_MODEL } from '@/utils/analytics-prompts';
 
 export const classifyMetric = async (
-	ai: Ai | undefined,
+	ai: AppBindings['AI'] | undefined,
 	request: AnalyticsChatRequestWithHistory,
 ): Promise<AnalyticsClassificationResult> => {
 	if (!ai) {
@@ -41,7 +42,7 @@ export const classifyMetric = async (
 };
 
 export const generateAnalyticsAnswer = async (
-	ai: Ai | undefined,
+	ai: AppBindings['AI'] | undefined,
 	request: AnalyticsChatRequestWithHistory,
 	injection: string,
 	fallbackAnswer: string,
@@ -76,7 +77,7 @@ export const logAnalyticsEvent = (
 };
 
 const classifyMetricWithAi = async (
-	ai: Ai,
+	ai: AppBindings['AI'],
 	request: AnalyticsChatRequestWithHistory,
 ): Promise<AnalyticsClassification | null> => {
 	const response = await ai.run(ANALYTICS_AI_MODEL, {
