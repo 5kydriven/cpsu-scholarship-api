@@ -46,7 +46,7 @@ app.doc('/openapi.json', (c) => ({
 	},
 	servers: [
 		{
-			url: new URL(c.req.url).origin,
+			url: c.env.BETTER_AUTH_URL || new URL(c.req.url).origin,
 			description: 'Current environment',
 		},
 	],
